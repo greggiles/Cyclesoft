@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Timers;
 
-namespace ANTSniffer
+namespace CycleSoft
 {
 
     // A delegate type for hooking up change notifications.

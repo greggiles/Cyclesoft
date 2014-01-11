@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading;
 using Fleck;
 
-namespace ANTSniffer
+namespace CycleSoft
 {
     class cWebSocketServer
     {

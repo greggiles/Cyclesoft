@@ -10,7 +10,7 @@ using System.Xml;
 using System.Xml.XPath;
 
 
-namespace ANTSniffer
+namespace CycleSoft
 {
     public delegate void userUpdateHandler(object sender, userEventArgs e);
 

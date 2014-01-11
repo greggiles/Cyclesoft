@@ -6,7 +6,7 @@ using System.Text;
 using ANT_Managed_Library;      //Reference the ANT_Managed_Library namespace to make the code easier and more readable 
 
 
-namespace ANTSniffer
+namespace CycleSoft
 {
 
     public delegate void statusMsgHandler(object sender, EventArgs e);

@@ -17,7 +17,7 @@ using System.Windows.Shapes;
 using System.Xml;
 using System.Xml.XPath;
 
-namespace ANTSniffer
+namespace CycleSoft
 {
 
     /// <summary>

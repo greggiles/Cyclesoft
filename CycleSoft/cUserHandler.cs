@@ -7,7 +7,7 @@ using System.Xml;
 using System.Xml.XPath;
 
 
-namespace ANTSniffer
+namespace CycleSoft
 {
     public class cUserHandler
     {

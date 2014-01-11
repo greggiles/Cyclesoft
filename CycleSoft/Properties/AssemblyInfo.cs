@@ -7,11 +7,11 @@ using System.Windows;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("ANTSniffer")]
+[assembly: AssemblyTitle("CycleSoft")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("HP")]
-[assembly: AssemblyProduct("ANTSniffer")]
+[assembly: AssemblyProduct("CycleSoft")]
 [assembly: AssemblyCopyright("Copyright © HP 2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

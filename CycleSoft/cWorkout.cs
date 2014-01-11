@@ -10,7 +10,7 @@ using System.Xml;
 using System.Xml.XPath;
 
 
-namespace ANTSniffer
+namespace CycleSoft
 {
     public delegate void workoutEventHandler(object sender, EventArgs e);
     public delegate void workoutEventStartStop(object sender, EventArgs e);
