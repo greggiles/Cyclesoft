@@ -76,16 +76,12 @@ namespace CycleSoft
         public int activeSegment { get; private set; }
 
         public workoutDef activeWorkout;
-
-        private bool bIsLoaded;
-        private bool bIsStarted;
         private bool bIsPaused;
         public bool bIsFinished { get; private set; }
         public bool bIsRunning {get; private set;}
 
         public int workOutSeconds { get; private set; }
 
-        private bool bTargetOver;
 
         public cWorkout()
         {
@@ -97,10 +93,6 @@ namespace CycleSoft
             newWorkout.segments = new List<segmentDef>();
             segmentDef newSegment = new segmentDef();
 
-            bTargetOver = false;
-
-            bIsLoaded = false;
-            bIsStarted = false;
             bIsPaused = false;
             bIsFinished = false;
 
@@ -200,9 +192,7 @@ namespace CycleSoft
             wEA.workoutTotalMS = activeWorkout.length*1000;
             wEA.starting = true;
             workoutEventHandler(this, wEA);
-            bIsLoaded = true;
             workOutSeconds = 0;
-            bTargetOver = false;
             return true;
         }
         
@@ -232,12 +222,17 @@ namespace CycleSoft
             return true;
         }
 
-
         public bool playPauseWorkout()
         {
+            if (workoutCountDown > 0)
+            {
+                if (_countDownTimer.Enabled) _countDownTimer.Enabled = false;
+                else _countDownTimer.Enabled = true;
+                return true;
+            }
             if (workoutTime == null) return false;
-            if (workoutTime.ElapsedMilliseconds<=0) return false;
-            
+            if (workoutTime.ElapsedMilliseconds <= 0) return false;
+
             if (!bIsPaused)
             {
                 bIsPaused = true;
@@ -270,9 +265,6 @@ namespace CycleSoft
 
             bIsPaused=false;
             bIsFinished = false;
-            bIsLoaded = false;
-            bIsStarted = false;
-            bTargetOver = false;
             bIsRunning = false;
             return true;
         }
@@ -300,7 +292,6 @@ namespace CycleSoft
                 wEA.segmentTotalMS = activeWorkout.segments[0].length * 1000;
                 wEA.workoutTotalMS = activeWorkout.length*1000;
 
-                bIsStarted = true;
                 workoutTime = new Stopwatch();
                 workoutTime.Start();
                 if (null != workoutEventStartStop) 
@@ -342,7 +333,6 @@ namespace CycleSoft
                 //New Segment!!
                 activeSegment++;
                 msTimeForNextSegment += activeWorkout.segments[activeSegment].length * 1000;
-                bTargetOver = false;
                 wEA.message = activeWorkout.segments[activeSegment].segmentName;
             }
             if (workoutTime.ElapsedMilliseconds / 1000 < activeWorkout.length && !forceFinish)
@@ -403,7 +393,8 @@ namespace CycleSoft
             else
             {
                 // Workout is over!!
-                bIsFinished = true;
+                if (!forceFinish)
+                    bIsFinished = true;
                 forceFinish = false;
 
                 workoutTime.Stop();

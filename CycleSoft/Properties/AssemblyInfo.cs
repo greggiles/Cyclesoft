@@ -10,9 +10,9 @@ using System.Windows;
 [assembly: AssemblyTitle("CycleSoft")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("HP")]
-[assembly: AssemblyProduct("CycleSoft")]
-[assembly: AssemblyCopyright("Copyright © HP 2013")]
+[assembly: AssemblyCompany("CycleSoft")]
+[assembly: AssemblyProduct("WorkoutTracker")]
+[assembly: AssemblyCopyright("CycleSoft")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

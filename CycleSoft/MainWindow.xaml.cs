@@ -28,8 +28,6 @@ namespace CycleSoft
         //This delegate is for using the dispatcher to avoid conflicts of the feedback thread referencing the UI elements
         delegate void dAppendText(String toAppend);
 
-        StreamWriter log;
-
         private cAntHandler AntHandler;
         private cStreamHandler StreamHandler;
         private cUserHandler UserHandler;
@@ -44,6 +42,7 @@ namespace CycleSoft
 
         public MainWindow()
         {
+
             //totally cheating, and making this hard coded for now
             b_hasVid = false;
             // video file is linked from xaml file, anyways.
@@ -82,15 +81,16 @@ namespace CycleSoft
             {
                 AntHandler.channelMessageHandler += StreamHandler.handleAntData;
                 button_Start.Background = System.Windows.Media.Brushes.Salmon;
-                button_Start.Content = "Stop";
-                if ((bool)bLogStreams.IsChecked)
-                {
-                    String Filename = "logfile.txt";
-                    log = new StreamWriter(Filename.ToString());
-                }
+                button_Start.Content = "ANT ENABLED";
             }
-            button3.IsEnabled = false;
-            button3.Content = "Select Workout";
+            bStartWorkout.IsEnabled = false;
+            bStartWorkout2.IsEnabled = false;
+            bEndWorkout.IsEnabled = false;
+            bEndWorkout2.IsEnabled = false;
+            bStartWorkout.Content = "Select Workout";
+            bStartWorkout2.Content = "Select Workout";
+            bEndWorkout.Content = "End Workout";
+            bEndWorkout2.Content = "End Workout";
 
         }
 
@@ -103,12 +103,9 @@ namespace CycleSoft
                 {
                     AntHandler.channelMessageHandler += StreamHandler.handleAntData;
                     button_Start.Background = System.Windows.Media.Brushes.Salmon;
-                    button_Start.Content = "Stop";
-                    if ((bool)bLogStreams.IsChecked)
-                    {
-                        String Filename = "logfile.txt";
-                        log = new StreamWriter(Filename.ToString());
-                    }
+                    button_Start.Content = "ANT ENABLED";
+                    lbl_ANTStatus.Content = "Press \"ANT ENABLED\" button to stop";
+
                     return;
                 }
             }
@@ -120,18 +117,8 @@ namespace CycleSoft
             
             button_Start.Background = System.Windows.Media.Brushes.LightGreen;
             button_Start.Content = "Start";
+            lbl_ANTStatus.Content = "ANT Device not Found, try installing or disabling Garmin Agent, then press \"Start\"";
 
-            if (log != null)
-            {
-                log.Close();
-            }
-        }
-
-        void initiateUserPointPanel(UserPointPanel upp, int userWin)
-        {
-            upp.Visibility = Visibility.Visible;
-            upp.textBox_FirstUser1.Text = userWindows[userWin].userStreamToClose.firstName;
-            upp.textBox_LastUser1.Text = userWindows[userWin].userStreamToClose.lastName;
         }
 
         void clrUserPointPanel(UserPointPanel upp)
@@ -221,16 +208,36 @@ namespace CycleSoft
                     dataGridSpdCad.Items.Refresh();
                     dataGridUsers.Items.Refresh();
 
-                    if(WorkoutHandler.bIsFinished)
-                        bStartWorkout.Content = "Clear Workout";
-
+                    if (WorkoutHandler.bIsFinished)
+                    {
+                        bStartWorkout.IsEnabled = false;
+                        bStartWorkout2.IsEnabled = false;
+                        bEndWorkout.IsEnabled = false;
+                        bEndWorkout2.IsEnabled = false;
+                        bStartWorkout.Content = "Select Workout";
+                        bStartWorkout2.Content = "Select Workout";
+                        bEndWorkout.Content = "End Workout";
+                        bEndWorkout2.Content = "End Workout";
+                    }
                     try
                     {
-                        textBoxTotalTime.Text = userWindows[0].textBoxTotalTime.Text;
-                        textBoxSegmentTime.Text = userWindows[0].textBoxSegmentTime.Text;
+                        string webresponse;
+                        if (userWindows.Count > 0)
+                        {
+                            textBoxTotalTime.Text = userWindows[0].textBoxTotalTime.Text;
+                            textBoxSegmentTime.Text = userWindows[0].textBoxSegmentTime.Text;
 
-                        string webresponse = userWindows[0].textBoxTotalTime.Text;
-                        webresponse += "<br>" + userWindows[0].textBoxSegmentTime.Text;
+                            webresponse = userWindows[0].textBoxTotalTime.Text;
+                            webresponse += "<br>" + userWindows[0].textBoxSegmentTime.Text;
+                        }
+                        else
+                        {
+                            textBoxTotalTime.Text = "??";
+                            textBoxSegmentTime.Text = "??";
+
+                            webresponse = "No Users Loaded<br>No Workout?<br>";
+
+                        }
 
                         switch (userWindows.Count)
                         {
@@ -277,20 +284,6 @@ namespace CycleSoft
             }));
         }
 
-        private void redraw_line(PathGeometry line, List<Point> points)
-        {
-            var figure = new PathFigure
-            {
-                StartPoint = points[0],
-                IsClosed = false
-            };
-
-            var segment = new PolyLineSegment(points, true);
-            figure.Segments.Add(segment);
-            line.Clear();
-            line.Figures.Add(figure);
-
-        }
 
         void UserWnd_Closed(object sender, EventArgs e)
         {
@@ -305,26 +298,6 @@ namespace CycleSoft
                     break;
                 }
             }
-
-        }
-
-        private void bLogDevice_Checked(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void bLogDevice_Unchecked(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void bLogStreams_Checked(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void bLogStreams_Unchecked(object sender, RoutedEventArgs e)
-        {
 
         }
 
@@ -365,35 +338,29 @@ namespace CycleSoft
             }
         }
 
+        private void buttonDeleteUsers_Click(object sender, RoutedEventArgs e)
+        {
+            if (dataGridUsers.SelectedIndex >= 0)
+            {
+                UserHandler.deleteUser(dataGridUsers.SelectedIndex);
+                dataGridUsers.Items.Refresh();
+            }
 
+        }
 
-        private void bStartWorkout_Click_1(object sender, RoutedEventArgs e)
+        
+        private void bStartWorkout_Click(object sender, RoutedEventArgs e)
         {
 
-            if (bStartWorkout.Content.Equals("Launch Workout"))
-            {
-                if (WorkoutHandler.loadWorkout(cbSelectWorkout.SelectedIndex))
-                {
-                    bStartWorkout.Content = "Start Workout";
-                    button3.Content = "Start Workout";
-                    button3.IsEnabled = true;
-
-                    this.Dispatcher.Invoke((Action)(() =>
-                    {
-                        userPointPanel1.polylineCanvas.Width = WorkoutHandler.activeWorkout.length;
-                        userPointPanel2.polylineCanvas.Width = WorkoutHandler.activeWorkout.length;
-                        userPointPanel3.polylineCanvas.Width = WorkoutHandler.activeWorkout.length;
-                        userPointPanel4.polylineCanvas.Width = WorkoutHandler.activeWorkout.length;
-                    }));
-
-                }
-            }
-            else if (bStartWorkout.Content.Equals("Start Workout"))
+            if (bStartWorkout.Content.Equals("Start Workout"))
             {
                 if (WorkoutHandler.startWorkout())
                 {
+                    cbSelectWorkout.IsEnabled = false;
                     bStartWorkout.Content = "Pause Workout";
-                    button3.Content = "Pause Workout";
+                    bStartWorkout2.Content = "Pause Workout";
+                    bEndWorkout.IsEnabled = false;
+                    bEndWorkout2.IsEnabled = false;
                 }
             }
             else if (bStartWorkout.Content.Equals("Pause Workout"))
@@ -401,7 +368,9 @@ namespace CycleSoft
                 if (WorkoutHandler.playPauseWorkout())
                 {
                     bStartWorkout.Content = "Re-Start Workout";
-                    button3.Content = "Re-Start Workout";
+                    bStartWorkout2.Content = "Re-Start Workout";
+                    bEndWorkout.IsEnabled = true;
+                    bEndWorkout2.IsEnabled = true;
                     if(b_hasVid)
                         mediaElement1.Pause();
                 }
@@ -411,47 +380,69 @@ namespace CycleSoft
                 if (WorkoutHandler.playPauseWorkout())
                 {
                     bStartWorkout.Content = "Pause Workout";
-                    button3.Content = "Pause Workout";
+                    bStartWorkout2.Content = "Pause Workout";
+                    bEndWorkout.IsEnabled = false;
+                    bEndWorkout2.IsEnabled = false;
                     if (b_hasVid)
                         mediaElement1.Play();
                 }
             }
-            else if (bStartWorkout.Content.Equals("Clear Workout"))
-            {
-                if (WorkoutHandler.resetWorkout())
-                {
-                    bStartWorkout.Content = "Launch Workout";
-                    cbSelectWorkout.SelectedIndex = 0;
-                    bStartWorkout.IsEnabled = false;
-                }
-            }
 
         }
+
+
+        private void bEndWorkout_Click(object sender, RoutedEventArgs e)
+        {
+            cbSelectWorkout.IsEnabled = true;
+            cbSelectWorkout.SelectedIndex = -1;
+
+            WorkoutHandler.finish();
+            WorkoutHandler.resetWorkout();
+            
+            bStartWorkout.IsEnabled = false;
+            bStartWorkout2.IsEnabled = false;
+            bEndWorkout.IsEnabled = false;
+            bEndWorkout2.IsEnabled = false;
+            bStartWorkout.Content = "Select Workout";
+            bStartWorkout2.Content = "Select Workout";
+            bEndWorkout.Content = "End Workout";
+            bEndWorkout2.Content = "End Workout";
+        }
+
 
         private void cbSelectWorkout_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (bStartWorkout.Content.Equals("Start Workout"))
-            {
-                bStartWorkout.Content = "Launch Workout";
-                bStartWorkout.IsEnabled = false;
-            }
-
             if (cbSelectWorkout.SelectedIndex >= 0)
-                bStartWorkout.IsEnabled = true;
-
-            if (null == WorkoutHandler.workOutList[cbSelectWorkout.SelectedIndex].videopath)
-                b_hasVid = false;
-            else
             {
-                b_hasVid = true;
-                var uri = new System.Uri(WorkoutHandler.workOutList[cbSelectWorkout.SelectedIndex].videopath);
-                var converted = uri.AbsoluteUri;
-                mediaElement1.Source = uri;
+                if (WorkoutHandler.loadWorkout(cbSelectWorkout.SelectedIndex))
+                {
+                    bStartWorkout.IsEnabled = true;
+                    bStartWorkout2.IsEnabled = true;
+                    bStartWorkout.Content = "Start Workout";
+                    bStartWorkout2.Content = "Start Workout";
+                    WorkoutHandler.resetWorkout();
+
+                    this.Dispatcher.Invoke((Action)(() =>
+                    {
+                        userPointPanel1.polylineCanvas.Width = WorkoutHandler.activeWorkout.length;
+                        userPointPanel2.polylineCanvas.Width = WorkoutHandler.activeWorkout.length;
+                        userPointPanel3.polylineCanvas.Width = WorkoutHandler.activeWorkout.length;
+                        userPointPanel4.polylineCanvas.Width = WorkoutHandler.activeWorkout.length;
+                    }));
+
+                    if (null == WorkoutHandler.workOutList[cbSelectWorkout.SelectedIndex].videopath)
+                        b_hasVid = false;
+                    else
+                    {
+                        b_hasVid = true;
+                        var uri = new System.Uri(WorkoutHandler.workOutList[cbSelectWorkout.SelectedIndex].videopath);
+                        var converted = uri.AbsoluteUri;
+                        mediaElement1.Source = uri;
+                    }
+                    drawLocalChart();
+                }
             }
-            drawLocalChart();
-
         }
-
         private void drawLocalChart()
         {
             Point[] currentWorkoutPoints = drawingEngine.getWorkoutPoints(WorkoutHandler.workOutList[cbSelectWorkout.SelectedIndex]);
@@ -510,48 +501,6 @@ namespace CycleSoft
             }
         }
 
-        public void button2_Click(object sender, RoutedEventArgs e)
-        {
-            if (b_hasVid)
-                mediaElement1.Play();
-        }
-
-        private void button3_Click(object sender, RoutedEventArgs e)
-        {
-            if (button3.Content.Equals("Pause Workout"))
-            {
-                if (WorkoutHandler.playPauseWorkout())
-                {
-                    bStartWorkout.Content = "Re-Start Workout";
-                    button3.Content = "Re-Start Workout";
-                    if (b_hasVid)
-                        mediaElement1.Pause();
-                }
-            }
-            else if (button3.Content.Equals("Re-Start Workout"))
-            {
-                if (WorkoutHandler.playPauseWorkout())
-                {
-                    bStartWorkout.Content = "Pause Workout";
-                    button3.Content = "Re-Start Workout";
-                    if (b_hasVid)
-                        mediaElement1.Play();
-                }
-            }
-
-        }
-
-        private void button4_Click(object sender, RoutedEventArgs e)
-        {
-            if (b_hasVid)
-                mediaElement1.Stop();
-            WorkoutHandler.finish();
-        }
-
-        private void textBox3_TextChanged(object sender, TextChangedEventArgs e)
-        {
-
-        }
 
         private void mediaElement1_MediaOpened(object sender, RoutedEventArgs e)
         {
@@ -596,6 +545,7 @@ namespace CycleSoft
             textBoxFTP.SelectAll();
         }
 
+ 
 
     }
 

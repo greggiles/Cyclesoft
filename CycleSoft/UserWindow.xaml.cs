@@ -29,7 +29,6 @@ namespace CycleSoft
         private int cadInst;
         private int hb;
         private int powerInst;
-        private int powerAvg;
         private int powerMax;
 
         private workoutDef activeWorkout;

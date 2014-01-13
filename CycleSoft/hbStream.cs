@@ -14,14 +14,8 @@ namespace CycleSoft
         const byte pHBCNT = 7;
         const byte pHBCALC = 8;
 
-        private UInt16 hbTime;
-        private UInt16 hbTimePrev;
-        private UInt16 hbCnt;
         private UInt16 hbCntPrev;
 
-
-
-        private UInt16 lasthbEventCnt;
         private int messageCnt;
 
         public hbStream(ushort sAddress, byte sType, uint uId) :base (sAddress, sType, uId)

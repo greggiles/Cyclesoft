@@ -14,12 +14,15 @@ namespace CycleSoft
         public List<cAntUsers> l_Users;
         XmlReader reader;
         private string[] userFileArray;
-
+        private string userPath;
         public cUserHandler(cStreamHandler StreamHandler)
         {
             l_Users = new List<cAntUsers>();
 
-            userFileArray = Directory.GetFiles(".\\users\\", "*.xml");
+            userPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "CycleSoft\\Users\\");
+            Directory.CreateDirectory(userPath);
+            userFileArray = Directory.GetFiles(userPath, "*.xml");
+
             for (int i = 0; i < userFileArray.Length; i++)
             {
 
@@ -134,7 +137,7 @@ namespace CycleSoft
                     <virtPower>16</virtPower>
                 </User>
             */
-            Stream userOutContents = File.Open("users\\" + user.firstName +"_"+user.lastName+"_"+user.ptrSPwr.ToString()+".xml", FileMode.OpenOrCreate);
+            Stream userOutContents = File.Open(userPath + user.firstName +"_"+user.lastName+"_"+user.ptrSPwr.ToString()+".xml", FileMode.OpenOrCreate);
             StreamWriter userStreamWrite = new StreamWriter(userOutContents);
             userStreamWrite.WriteLine("<User fName = \"" + user.firstName + "\" lName = \"" + user.lastName + "\" ftp = \"" + user.ftp.ToString() + "\">");
             if(user.activePwrStream != null)
@@ -202,6 +205,16 @@ namespace CycleSoft
                     l_Users[toRemove].activeSpeedStream.updateEvent -= l_Users[toRemove].updateSpdCadEvent;
 
                 l_Users.RemoveAt(toRemove);
+                return true;
+            }
+            return false;
+        }
+        public bool deleteUser(int toRemove)
+        {
+
+            File.Delete(userPath + l_Users[toRemove].firstName + "_" + l_Users[toRemove].lastName + "_" + l_Users[toRemove].ptrSPwr.ToString() + ".xml");
+            if (removeUser(toRemove))
+            {
                 return true;
             }
             return false;

@@ -21,51 +21,22 @@ namespace CycleSoft
 
     public class cAntHandler
     {
-
-        
-        static readonly byte USER_ANT_CHANNEL = 0;         // ANT Channel to use
         static readonly ushort USER_DEVICENUM = 0;        // Device number    
         static readonly byte USER_DEVICETYPE = 0;          // Device type
         static readonly byte USER_TRANSTYPE = 0;           // Transmission type
         static readonly byte USER_RADIOFREQ = 57;          // RF Frequency + 2400 MHz
         static readonly ushort USER_CHANNELPERIOD = 8192;  // Channel Period (8192/32768)s period = 4Hz
         static readonly byte[] USER_NETWORK_KEY = { 0xB9, 0xA5, 0x21, 0xFB, 0xBD, 0x72, 0xC3, 0x45 };
-        static readonly byte USER_NETWORK_NUM = 0;         // The network key is assigned to this network number
-
-
 
         private ANT_Device device0;
 
-        public event EventHandler<antEventArgs> statusMessageHandler;
         public event EventHandler<antEventArgs> channelMessageHandler;
-        public event EventHandler<antEventArgs> deviceMessageHandler;
 
-        public bool[] bDeviceAvailable { get; private set; }
 
         public cAntHandler()
         {
 
-            bDeviceAvailable = new bool[8];
-            updateUSBAvailable();
         }
-
-        public void updateUSBAvailable()
-        {
-            for (int i = 0; i < 8; i++)
-            {
-                try
-                {
-                    bDeviceAvailable[i] = false;
-                    device0.getDeviceUSBInfo(0);
-                    bDeviceAvailable[i] = true;
-                }
-                catch
-                {
-                    //just checking
-                }
-            }
-
-        }   
         //Creates the ANTDevice instances and calls the setupAndOpen routine according to the selected demo mode
         public bool startUp()
         {
@@ -77,9 +48,9 @@ namespace CycleSoft
                 //The library has an automatic constructor to automatically connect to the first available device
                 //You can still manually choose which device to connect to by using the parameter constructor,
                 // ie: ANTDeviceInstance = new ANTDevice(0, 57600)
-                device0 = new ANT_Device(0, 57600);
-
-
+                device0 = new ANT_Device();
+                //device0 = new ANT_Device(0, 57600);
+                
                 //First we want to setup the response functions so we can see the feedback as we setup
                 //To do this, the device and each channel have response events which are fired when feedback
                 //is received from the device, including command acknowledgements and transmission events.

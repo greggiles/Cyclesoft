@@ -8,7 +8,6 @@ namespace CycleSoft
     public class cStreamHandler
     {
         static readonly int pUID = 9;
-        static readonly int pADDRESS = 10;
         static readonly int pTYPE = 12;
 
         public List<powerStream> pwrStreams;

@@ -73,22 +73,6 @@ namespace CycleSoft
 
         public UInt32 uniqueID { get; set; }
 
-
-        private Queue<int> qPWRQue;
-        private UInt16 pwrEventCnt;
-
-        private UInt16 cadTime;
-        private UInt16 cadTimePrev;
-        private UInt16 cadCnt;
-        private UInt16 cadCntPrev;
-        private UInt16 cad;
-
-        private UInt16 spdTime;
-        private UInt16 spdTimePrev;
-        private UInt16 spdCnt;
-        private UInt16 spdCntPrev;
-        private UInt16 spd;
-
         protected bool stillAlive;
         protected StreamWriter log;
 

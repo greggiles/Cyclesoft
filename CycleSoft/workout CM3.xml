@@ -1,0 +1,152 @@
+<Workout Title = "CM3">
+	<segment type = "steady" id = "Start" length = "180">
+		<!--RPE 5 -->
+		<effort start = ".757" plus = ".15" minus = ".02"/>
+		<cad target = "0" plus = "200" minus = "0"/>
+	</segment>
+	<segment type = "steady" id = "FP1" length = "60">
+		<!--RPE 9 -->
+		<effort start = "1.271" plus = ".15" minus = ".02"/>
+		<cad target = "0" plus = "200" minus = "0"/>
+	</segment>
+	<segment type = "steady" id = "Start" length = "60">
+		<!--RPE 3 -->
+		<effort start = ".5" plus = ".15" minus = ".02"/>
+		<cad target = "0" plus = "200" minus = "0"/>
+	</segment>
+	<segment type = "steady" id = "FP2" length = "60">
+		<!--RPE 9 -->
+		<effort start = "1.271" plus = ".15" minus = ".02"/>
+		<cad target = "0" plus = "200" minus = "0"/>
+	</segment>
+	<segment type = "steady" id = "Start" length = "120">
+		<!--RPE 5 -->
+		<effort start = ".757" plus = ".15" minus = ".02"/>
+		<cad target = "0" plus = "200" minus = "0"/>
+	</segment>
+	<segment type = "steady" id = "TempoClimb" length = "600">
+		<!--RPE 7 -->
+		<effort start = "1.014" plus = ".15" minus = ".02"/>
+		<cad target = "0" plus = "200" minus = "0"/>
+	</segment>
+	<segment type = "steady" id = "Rest" length = "300">
+		<!--RPE 3 -->
+		<effort start = ".5" plus = ".15" minus = ".02"/>
+		<cad target = "0" plus = "200" minus = "0"/>
+	</segment>
+	<segment type = "steady" id = "Start" length = "30">
+		<!--RPE 10 -->
+		<effort start = "1.4" plus = ".15" minus = ".02"/>
+		<cad target = "0" plus = "200" minus = "0"/>
+	</segment>
+	<segment type = "steady" id = "Start" length = "30">
+		<!--RPE 3 -->
+		<effort start = ".5" plus = ".15" minus = ".02"/>
+		<cad target = "0" plus = "200" minus = "0"/>
+	</segment>
+	<segment type = "steady" id = "Start" length = "30">
+		<!--RPE 10 -->
+		<effort start = "1.4" plus = ".15" minus = ".02"/>
+		<cad target = "0" plus = "200" minus = "0"/>
+	</segment>
+	<segment type = "steady" id = "Start" length = "30">
+		<!--RPE 3 -->
+		<effort start = ".5" plus = ".15" minus = ".02"/>
+		<cad target = "0" plus = "200" minus = "0"/>
+	</segment>
+	<segment type = "steady" id = "Start" length = "30">
+		<!--RPE 10 -->
+		<effort start = "1.4" plus = ".15" minus = ".02"/>
+		<cad target = "0" plus = "200" minus = "0"/>
+	</segment>
+	<segment type = "steady" id = "Start" length = "30">
+		<!--RPE 3 -->
+		<effort start = ".5" plus = ".15" minus = ".02"/>
+		<cad target = "0" plus = "200" minus = "0"/>
+	</segment>
+	<segment type = "steady" id = "Start" length = "30">
+		<!--RPE 10 -->
+		<effort start = "1.4" plus = ".15" minus = ".02"/>
+		<cad target = "0" plus = "200" minus = "0"/>
+	</segment>
+	<segment type = "steady" id = "Start" length = "30">
+		<!--RPE 3 -->
+		<effort start = ".5" plus = ".15" minus = ".02"/>
+		<cad target = "0" plus = "200" minus = "0"/>
+	</segment>
+	<segment type = "steady" id = "Start" length = "30">
+		<!--RPE 10 -->
+		<effort start = "1.4" plus = ".15" minus = ".02"/>
+		<cad target = "0" plus = "200" minus = "0"/>
+	</segment>
+	<segment type = "steady" id = "Start" length = "30">
+		<!--RPE 3 -->
+		<effort start = ".5" plus = ".15" minus = ".02"/>
+		<cad target = "0" plus = "200" minus = "0"/>
+	</segment>
+	<segment type = "steady" id = "Start" length = "240">
+		<!--RPE 3 -->
+		<effort start = ".5" plus = ".15" minus = ".02"/>
+		<cad target = "0" plus = "200" minus = "0"/>
+	</segment>
+	<segment type = "steady" id = "Start" length = "300">
+		<!--RPE 5 -->
+		<effort start = ".757" plus = ".15" minus = ".02"/>
+		<cad target = "0" plus = "200" minus = "0"/>
+	</segment>
+	<segment type = "steady" id = "Start" length = "300">
+		<!--RPE 3 -->
+		<effort start = ".5" plus = ".15" minus = ".02"/>
+		<cad target = "0" plus = "200" minus = "0"/>
+	</segment>
+	<segment type = "steady" id = "Start" length = "60">
+		<!--RPE 6 -->
+		<effort start = ".886" plus = ".15" minus = ".02"/>
+		<cad target = "0" plus = "200" minus = "0"/>
+	</segment>
+	<segment type = "steady" id = "Start" length = "60">
+		<!--RPE 7 -->
+		<effort start = "1.014" plus = ".15" minus = ".02"/>
+		<cad target = "0" plus = "200" minus = "0"/>
+	</segment>
+	<segment type = "steady" id = "Start" length = "60">
+		<!--RPE 8 -->
+		<effort start = "1.143" plus = ".15" minus = ".02"/>
+		<cad target = "0" plus = "200" minus = "0"/>
+	</segment>
+	<segment type = "steady" id = "Start" length = "60">
+		<!--RPE 9 -->
+		<effort start = "1.271" plus = ".15" minus = ".02"/>
+		<cad target = "0" plus = "200" minus = "0"/>
+	</segment>
+	<segment type = "steady" id = "Start" length = "300">
+		<!--RPE 3 -->
+		<effort start = ".5" plus = ".15" minus = ".02"/>
+		<cad target = "0" plus = "200" minus = "0"/>
+	</segment>
+	<segment type = "steady" id = "Start" length = "60">
+		<!--RPE 6 -->
+		<effort start = ".886" plus = ".15" minus = ".02"/>
+		<cad target = "0" plus = "200" minus = "0"/>
+	</segment>
+	<segment type = "steady" id = "Start" length = "60">
+		<!--RPE 7 -->
+		<effort start = "1.014" plus = ".15" minus = ".02"/>
+		<cad target = "0" plus = "200" minus = "0"/>
+	</segment>
+	<segment type = "steady" id = "Start" length = "60">
+		<!--RPE 8 -->
+		<effort start = "1.143" plus = ".15" minus = ".02"/>
+		<cad target = "0" plus = "200" minus = "0"/>
+	</segment>
+	<segment type = "steady" id = "Start" length = "60">
+		<!--RPE 9 -->
+		<effort start = "1.271" plus = ".15" minus = ".02"/>
+		<cad target = "0" plus = "200" minus = "0"/>
+	</segment>
+	<segment type = "steady" id = "Start" length = "300">
+		<!--RPE 3 -->
+		<effort start = ".5" plus = ".15" minus = ".02"/>
+		<cad target = "0" plus = "200" minus = "0"/>
+	</segment>
+</Workout>
