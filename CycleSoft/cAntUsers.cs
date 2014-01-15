@@ -16,12 +16,16 @@ namespace CycleSoft
 
     public class userEventArgs : EventArgs
     {
+        public string name { get; set; }
         public int instPwr { get; set; }
         public int avgPwr { get; set; }
         public int hr { get; set; }
         public int cad { get; set; }
         public double speed { get; set; }
         public int lastAvgPwr { get; set; }
+        public double points { get; set; }
+        public int ftp { get; set; }
+
     }
 
     public class powerPoints
@@ -112,7 +116,7 @@ namespace CycleSoft
             speedPowerCalcs = new cSpowerCalcs();
             ptrSPwr = -1;
 
-            Timer _timer = new Timer(1000); //250
+            Timer _timer = new Timer(500); //250
             _timer.Elapsed += new ElapsedEventHandler(_timerElapsed);
             _timer.Enabled = true;
 
@@ -266,6 +270,11 @@ namespace CycleSoft
                 uEA.lastAvgPwr = 0;
                 if (lastSegment > 0)
                     uEA.lastAvgPwr = segAvgPower[lastSegment - 1];
+                uEA.points = points;
+
+                uEA.ftp = ftp;
+                uEA.name = firstName + " " + lastName;
+
                 userUpdateHandler(this, uEA);
             }
         }

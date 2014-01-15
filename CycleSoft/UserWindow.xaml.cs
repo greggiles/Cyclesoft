@@ -29,13 +29,15 @@ namespace CycleSoft
         private int cadInst;
         private int hb;
         private int powerInst;
-        private int powerMax;
+        private double powerMax;
 
         private workoutDef activeWorkout;
 
         public cAntUsers userStreamToClose { get; protected set; }
         private cWorkout workoutStreamToClose;
-        workoutEventArgs workoutStatus;
+        public workoutEventArgs workoutStatus {  get; protected set; }
+        public userEventArgs userStatus {  get; protected set; }
+
 
         private bool bWorkoutRunning;
 
@@ -92,6 +94,7 @@ namespace CycleSoft
 
         public void updateEvent(object sender, userEventArgs e)
         {
+            userStatus = e;
             this.Dispatcher.Invoke((Action)(() => {
 
                 userStreamToClose = (cAntUsers)sender;
@@ -109,7 +112,18 @@ namespace CycleSoft
                 textPwrAvg.Text = e.avgPwr.ToString();
                 textPwrAvgLast.Text = e.lastAvgPwr.ToString();
 
-                textBoxPoints.Text = userStreamToClose.points.ToString();
+                textBoxPoints.Text = e.points.ToString();
+
+                try
+                {
+                    labelPwr50.Content = e.ftp.ToString();
+                    powerMax = (e.ftp + (dwgEngine.chartZoom * e.ftp / 2));
+                    labelPwrMax.Content = ((int)(powerMax)).ToString();
+                    labelPwr75.Content = ((int)(3 * powerMax / 4)).ToString();
+                    labelPwr25.Content = ((int)(powerMax / 4)).ToString();
+                }
+                catch { }
+
 
                 // Draw Instant Power Bar
                 var points = new Point[4];
@@ -162,14 +176,14 @@ namespace CycleSoft
                 if (bWorkoutRunning)
                 {
                     y = workoutStatus.segmentCurrentTarget / 2;
-                    ymin = y - activeWorkout.segments[workoutStatus.currentSegment].ptsMinus / 2;
+                    ymin = y - workoutStatus.pointsMinus / 2;
                     if (ymin < 0) ymin = 0;
-                    ymax = y + activeWorkout.segments[workoutStatus.currentSegment].ptsPlus / 2;
+                    ymax = y + workoutStatus.pointsPlus / 2;
                     if (ymax > 1) ymax = 1;
                 }
                 else
                 {
-                    y = 1 - (double)userStreamToClose.ftp / powerMax;
+                    y = 1 - (double)e.ftp / powerMax;
                 }
 
                 points = new Point[10];
@@ -202,9 +216,9 @@ namespace CycleSoft
                 if (bWorkoutRunning)
                 {
                     y = (double)workoutStatus.segmentCadTarget / 150;
-                    ymin = y - (double)activeWorkout.segments[workoutStatus.currentSegment].ptsCadMinus / 150;
+                    ymin = y - (double)workoutStatus.pointsCadMinus / 150;
                     if (ymin < 0) ymin = 0;
-                    ymax = y + (double)activeWorkout.segments[workoutStatus.currentSegment].ptsCadPlus / 150;
+                    ymax = y + (double)workoutStatus.pointsCadPlus / 150;
                     if (ymax > 1) ymax = 1;
                 }
                 else
@@ -271,12 +285,12 @@ namespace CycleSoft
 
                     // send more Points to User. Note THIS REALLY DOESN"T BELONG HERE? :(
                     double powerdiff = 2*(y - workoutStatus.segmentCurrentTarget/2);
-                    if (powerdiff < 0 && -powerdiff <= activeWorkout.segments[workoutStatus.currentSegment].ptsMinus)
+                    if (powerdiff < 0 && -powerdiff <= workoutStatus.pointsMinus)
                     {
                         userStreamToClose.points += .5;
                         powerMeterCanvas.Background = new SolidColorBrush(Colors.Yellow);
                     }
-                    else if (powerdiff > 0 && powerdiff <= activeWorkout.segments[workoutStatus.currentSegment].ptsPlus)
+                    else if (powerdiff > 0 && powerdiff <= workoutStatus.pointsPlus)
                     {
                         userStreamToClose.points += 1;
                         powerMeterCanvas.Background = new SolidColorBrush(Colors.LightGreen);
@@ -284,15 +298,15 @@ namespace CycleSoft
                     else
                         powerMeterCanvas.Background = new SolidColorBrush(Colors.Black);
 
-                    if (cadInst >= activeWorkout.segments[workoutStatus.currentSegment].cadTarget)
+                    if (cadInst >= workoutStatus.segmentCadTarget)
                     {
-                        if (cadInst - activeWorkout.segments[workoutStatus.currentSegment].cadTarget <= activeWorkout.segments[workoutStatus.currentSegment].ptsCadPlus)
+                        if (cadInst - workoutStatus.segmentCadTarget <= workoutStatus.pointsCadPlus)
                         {
                             userStreamToClose.points += 1;
                             cadMeterCanvas.Background = new SolidColorBrush(Colors.LightGreen);
                         }
                     }
-                    else if (activeWorkout.segments[workoutStatus.currentSegment].cadTarget - cadInst <= activeWorkout.segments[workoutStatus.currentSegment].ptsCadMinus)
+                    else if (workoutStatus.segmentCadTarget - cadInst <= workoutStatus.pointsCadMinus)
                     {
                         userStreamToClose.points += .5;
                         cadMeterCanvas.Background = new SolidColorBrush(Colors.Yellow);
@@ -337,10 +351,7 @@ namespace CycleSoft
 
         public void setTitle(string name, int userMaxPower)
         {
-            this.Title = name;
-            powerMax = userMaxPower;
-            labelPwrMax.Content = Convert.ToString(userMaxPower);
-            
+            this.Title = name;            
         }
 
         public void changeZoom(double zoomValue)
@@ -412,16 +423,6 @@ namespace CycleSoft
             midline.Add(pt);
 
             redraw_line(pwr25line, midline);
-
-            try
-            {
-                labelPwr50.Content = userStreamToClose.ftp.ToString();
-                double power100 = (userStreamToClose.ftp + (dwgEngine.chartZoom * userStreamToClose.ftp / 2));
-                labelPwrMax.Content = ((int)(power100)).ToString();
-                labelPwr75.Content = ((int)(3 * power100 / 4)).ToString();
-                labelPwr25.Content = ((int)(power100 / 4)).ToString();
-            }
-            catch { }
 
         }
 

@@ -41,8 +41,26 @@ namespace CycleSoft
         public long segmentTotalMS { get; set; }            // needed
         public long segmentCurrentMS { get; set; }          // needed
         public double segmentCurrentTarget { get; set; }    // needed
+        public double pointsPlus { get; set; }
+        public double pointsMinus { get; set; }
         public double segmentCadTarget { get; set; }    // needed
+        public double pointsCadPlus { get; set; }
+        public double pointsCadMinus { get; set; }
         public int currentSegment { get; set; }             // needed? Used in UserWindow for Points
+        public segmentDef currentSegmentDef { get; set; }
+        /*      public string segmentName;
+                public string type;
+                public double effort;
+                public double effortFinish;
+                public double ptsPlus;
+                public double ptsMinus;
+                public int cadTarget;
+                public int ptsCadPlus;
+                public int ptsCadMinus;
+                public long length;
+                public long underTime;
+                public long overTime;
+         */
 
     }
 
@@ -196,6 +214,7 @@ namespace CycleSoft
             wEA.segmentTotalMS = activeWorkout.segments[0].length*1000;
             wEA.workoutTotalMS = activeWorkout.length*1000;
             wEA.starting = true;
+            wEA.currentSegmentDef = activeWorkout.segments[0];
             workoutEventHandler(this, wEA);
             workOutSeconds = 0;
             return true;
@@ -213,10 +232,18 @@ namespace CycleSoft
             workoutEventArgs wEA = getDefaultEventData();
             wEA.message = "Starting " + activeWorkout.title + " in " + workoutCountDown.ToString() + " Seconds";
             wEA.segmentCurrentTarget = activeWorkout.segments[0].effort;
+            wEA.pointsPlus = activeWorkout.segments[0].ptsPlus;
+            wEA.pointsMinus = activeWorkout.segments[0].ptsMinus;
+
             wEA.segmentCadTarget = activeWorkout.segments[0].cadTarget;
-            wEA.segmentTotalMS = activeWorkout.segments[0].length*1000;
+            wEA.pointsCadPlus = activeWorkout.segments[0].ptsCadPlus;
+            wEA.pointsCadMinus = activeWorkout.segments[0].ptsCadMinus;
+
+            wEA.segmentTotalMS = activeWorkout.segments[0].length * 1000;
             wEA.workoutCurrentMS = 0;
             wEA.workoutTotalMS = activeWorkout.length*1000;
+
+            wEA.currentSegmentDef = activeWorkout.segments[0];
 
             workoutEventHandler(this, wEA);
 
@@ -283,8 +310,13 @@ namespace CycleSoft
             {
                 wEA.message = "Starting "+activeWorkout.title + " in " + workoutCountDown.ToString() + " Seconds";
                 wEA.segmentCurrentTarget = activeWorkout.segments[0].effort;
+                wEA.pointsPlus = activeWorkout.segments[0].ptsPlus;
+                wEA.pointsMinus = activeWorkout.segments[0].ptsMinus;
                 wEA.segmentCadTarget = activeWorkout.segments[0].cadTarget;
-                wEA.segmentTotalMS = activeWorkout.segments[0].length*1000;
+                wEA.pointsCadPlus = activeWorkout.segments[0].ptsCadPlus;
+                wEA.pointsCadMinus = activeWorkout.segments[0].ptsCadMinus;
+                wEA.segmentTotalMS = activeWorkout.segments[0].length * 1000;
+                wEA.currentSegmentDef = activeWorkout.segments[0];
                 wEA.workoutTotalMS = activeWorkout.length*1000;
             }
             else
@@ -293,8 +325,13 @@ namespace CycleSoft
                 activeSegment = 0;
                 wEA.message = "GGGGOOOOOO!!!";
                 wEA.segmentCurrentTarget = activeWorkout.segments[0].effort;
+                wEA.pointsPlus = activeWorkout.segments[0].ptsPlus;
+                wEA.pointsMinus = activeWorkout.segments[0].ptsMinus;
                 wEA.segmentCadTarget = activeWorkout.segments[0].cadTarget;
+                wEA.pointsCadPlus = activeWorkout.segments[0].ptsCadPlus;
+                wEA.pointsCadMinus = activeWorkout.segments[0].ptsCadMinus;
                 wEA.segmentTotalMS = activeWorkout.segments[0].length * 1000;
+                wEA.currentSegmentDef = activeWorkout.segments[0];
                 wEA.workoutTotalMS = activeWorkout.length*1000;
 
                 workoutTime = new Stopwatch();
@@ -355,6 +392,12 @@ namespace CycleSoft
                 wEA.workoutTotalMS = activeWorkout.length*1000;
                 wEA.segmentCurrentMS = activeWorkout.segments[activeSegment].length*1000 - (msTimeForNextSegment - workoutTime.ElapsedMilliseconds);
                 wEA.segmentTotalMS = activeWorkout.segments[activeSegment].length*1000;
+
+                wEA.pointsPlus = activeWorkout.segments[activeSegment].ptsPlus;
+                wEA.pointsMinus = activeWorkout.segments[activeSegment].ptsMinus;
+                wEA.pointsCadPlus = activeWorkout.segments[activeSegment].ptsCadPlus;
+                wEA.pointsCadMinus = activeWorkout.segments[activeSegment].ptsCadMinus;
+                wEA.currentSegmentDef = activeWorkout.segments[activeSegment];
                 switch (activeWorkout.segments[activeSegment].type)
                 {
                     case "steady":

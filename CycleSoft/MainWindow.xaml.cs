@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.IO;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -16,6 +17,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Xml;
 using System.Xml.XPath;
+using Newtonsoft.Json;
 
 namespace CycleSoft
 {
@@ -38,7 +40,13 @@ namespace CycleSoft
 
         private bool b_hasVid;
 
+
         private cWebSocketServer theServer;
+        public class JsonData
+        {
+            public workoutEventArgs wEA { get; set; }
+            public List<userEventArgs> uEAs { get; set; }
+        }
 
         public MainWindow()
         {
@@ -139,17 +147,8 @@ namespace CycleSoft
             upp.textBox_CADUser1.Text = "";
         }
 
-        string updateUserPointPanel(UserPointPanel upp, int userWin)
+        void updateUserPointPanel(UserPointPanel upp, int userWin)
         {
-            string webdata = "<br>"+ userWindows[userWin].userStreamToClose.firstName + " ";
-            webdata += userWindows[userWin].userStreamToClose.lastName + " <br>";
-            webdata += userWindows[userWin].userStreamToClose.instPower.ToString() + "/";
-            webdata += (WorkoutHandler.activeWorkout.segments[WorkoutHandler.activeSegment].effort * userWindows[userWin].userStreamToClose.ftp).ToString();
-
-            webdata += "<br><progress id='power' max='2' value = '";
-            webdata += ((double)userWindows[userWin].userStreamToClose.instPower / userWindows[userWin].userStreamToClose.ftp).ToString();
-            webdata += "'></progress>";
-
             upp.Visibility = Visibility.Visible;
             upp.textBox_FirstUser1.Text = userWindows[userWin].userStreamToClose.firstName;
             upp.textBox_LastUser1.Text = userWindows[userWin].userStreamToClose.lastName;
@@ -165,7 +164,8 @@ namespace CycleSoft
             upp.polylineCanvas.Margin = currentMargin;
                             
             upp.polyline.Clear();
-            upp.polyline.Figures.Add(userWindows[userWin].polyline.Figures[0]);
+            if (userWindows[userWin].polyline.Figures.Count > 0)
+                upp.polyline.Figures.Add(userWindows[userWin].polyline.Figures[0]);
 
             if (userWindows[userWin].pwrline.Figures.Count > upp.pwrline.Figures.Count)
             {
@@ -194,7 +194,6 @@ namespace CycleSoft
             upp.powerMeterCanvas.Background = userWindows[userWin].powerMeterCanvas.Background;
             upp.cadMeterCanvas.Background = userWindows[userWin].cadMeterCanvas.Background;
 
-            return webdata;
         }
 
 
@@ -254,28 +253,50 @@ namespace CycleSoft
                                 clrUserPointPanel(userPointPanel4);
                                 clrUserPointPanel(userPointPanel3);
                                 clrUserPointPanel(userPointPanel2);
-                                webresponse += updateUserPointPanel(userPointPanel1, 0);
+                                updateUserPointPanel(userPointPanel1, 0);
                                 break;
                             case 2:
                                 clrUserPointPanel(userPointPanel4);
                                 clrUserPointPanel(userPointPanel3);
-                                webresponse += updateUserPointPanel(userPointPanel2, 1);
-                                webresponse += updateUserPointPanel(userPointPanel1, 0);
+                                updateUserPointPanel(userPointPanel2, 1);
+                                updateUserPointPanel(userPointPanel1, 0);
                                 break;
                             case 3:
                                 clrUserPointPanel(userPointPanel4);
-                                webresponse += updateUserPointPanel(userPointPanel3, 2);
-                                webresponse += updateUserPointPanel(userPointPanel2, 1);
-                                webresponse += updateUserPointPanel(userPointPanel1, 0);
+                                updateUserPointPanel(userPointPanel3, 2);
+                                updateUserPointPanel(userPointPanel2, 1);
+                                updateUserPointPanel(userPointPanel1, 0);
                                 break;
                             default:
-                                webresponse += updateUserPointPanel(userPointPanel4, 3);
-                                webresponse += updateUserPointPanel(userPointPanel3, 2);
-                                webresponse += updateUserPointPanel(userPointPanel2, 1);
-                                webresponse += updateUserPointPanel(userPointPanel1, 0);
+                                updateUserPointPanel(userPointPanel4, 3);
+                                updateUserPointPanel(userPointPanel3, 2);
+                                updateUserPointPanel(userPointPanel2, 1);
+                                updateUserPointPanel(userPointPanel1, 0);
                                 break;
                         }
-                        theServer.senddata(webresponse);
+                        //theServer.senddata(webresponse);
+
+                        JsonData toSend = new JsonData();
+                        toSend.uEAs = new List<userEventArgs>();
+                        
+                        if (userWindows != null)
+                        {
+                            foreach (UserWindow uw in userWindows)
+                            {
+                                //workoutEventArgs wEa = new workoutEventArgs();
+                                //wEa = uw.workoutStatus;
+                                toSend.wEA = uw.workoutStatus;
+                                userEventArgs uEa = new userEventArgs();
+                                uEa = uw.userStatus;
+                                toSend.uEAs.Add(uEa);
+                            }
+                            var json = JsonConvert.SerializeObject(toSend,
+                                new JsonSerializerSettings() { Formatting = Newtonsoft.Json.Formatting.None });
+
+                            theServer.senddata(json);
+                        }
+
+
 
                     
                     }
@@ -313,7 +334,10 @@ namespace CycleSoft
                 UserWindow childWin = new UserWindow();
 
                 tempUser.userUpdateHandler += childWin.updateEvent;
+                // this should go away. Everything that happens below should probably go to 
+                // the tempUser update, and the above event should pass whatever is required.
                 WorkoutHandler.workoutEventHandler += childWin.updateWorkoutEvent;
+                // The below should handle most of the above.
                 WorkoutHandler.workoutEventHandler += tempUser.updateWorkoutEvent;
 
 

@@ -147,9 +147,9 @@
             <Label Content="20" Foreground="LightGreen" Height="42" HorizontalAlignment="Right" HorizontalContentAlignment="Right" Margin="0,120,0,121" Name="label13" VerticalAlignment="Center" Width="28" VerticalContentAlignment="Center" Grid.RowSpan="2" />
             <Label Content="30" Foreground="LightGreen" Height="39" HorizontalAlignment="Right" HorizontalContentAlignment="Right" Name="label14" VerticalAlignment="Center" VerticalContentAlignment="Center" Width="28" Margin="0,58,0,44" />
             <Label Content="10" Foreground="LightGreen" Height="34" HorizontalAlignment="Right" HorizontalContentAlignment="Right" Margin="0,58,0,50" Name="labelSpd10" VerticalAlignment="Center" VerticalContentAlignment="Center" Width="28" Grid.Row="1" />
-            <Label Content="100" Foreground="Yellow" HorizontalAlignment="Left" Margin="-3,77,0,78" Name="labelPwr50" Width="33" VerticalContentAlignment="Center" MinHeight="35" Panel.ZIndex="2" Grid.RowSpan="2" />
-            <Label Content="25" Foreground="Yellow" HorizontalAlignment="Left" Margin="0,29,0,35" Name="labelPwr25" VerticalContentAlignment="Center" Width="25" HorizontalContentAlignment="Right" Grid.Row="1" MinHeight="35" VerticalAlignment="Center" />
-            <Label Content="75" Foreground="Yellow" Name="labelPwr75" VerticalContentAlignment="Center" HorizontalContentAlignment="Right" MinHeight="35" Margin="0,27,0,36" VerticalAlignment="Center" HorizontalAlignment="Left" Width="24" />
+            <Label Content="100" Foreground="Yellow" HorizontalAlignment="Left" Margin="-3,77,0,78.2" Name="labelPwr50" Width="33" VerticalContentAlignment="Center" MinHeight="35" Panel.ZIndex="2" Grid.RowSpan="2" />
+            <Label Content="25" Foreground="Yellow" HorizontalAlignment="Left" Margin="-3,63.6,0,0" Name="labelPwr25" VerticalContentAlignment="Center" Width="25" HorizontalContentAlignment="Right" Grid.Row="1" MinHeight="35" VerticalAlignment="Top" />
+            <Label Content="75" Foreground="Yellow" Name="labelPwr75" VerticalContentAlignment="Center" HorizontalContentAlignment="Right" MinHeight="35" Margin="-3,62,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="24" />
         </Grid>
         <TextBlock Height="23" HorizontalAlignment="Right" Margin="0,7,22,0" Name="textBlock1" Text="Heartrate" VerticalAlignment="Top" Width="56" />
         <TextBlock Height="23" HorizontalAlignment="Right" Margin="0,6,106,0" Name="textBlock2" Text="Cadence" VerticalAlignment="Top" Width="56" />
