@@ -69,7 +69,7 @@ namespace CycleSoft
             WorkoutHandler = new cWorkout();
 
             theServer = new cWebSocketServer();
-
+            
             for (int i = 0; i < WorkoutHandler.workOutList.Count; i++)
             {
                 cbSelectWorkout.Items.Add(WorkoutHandler.workOutList[i].title);
@@ -279,7 +279,7 @@ namespace CycleSoft
                         JsonData toSend = new JsonData();
                         toSend.uEAs = new List<userEventArgs>();
                         
-                        if (userWindows != null)
+                        if (userWindows.Count > 0 || WorkoutHandler.bIsRunning)
                         {
                             foreach (UserWindow uw in userWindows)
                             {
@@ -485,6 +485,11 @@ namespace CycleSoft
                         mediaElement1.Source = uri;
                     }
                     drawLocalChart(cbSelectWorkout.SelectedIndex, polyline);
+
+                    var json = JsonConvert.SerializeObject(WorkoutHandler.activeWorkout,
+                        new JsonSerializerSettings() { Formatting = Newtonsoft.Json.Formatting.None });
+
+                    theServer.senddata(json);
                 }
             }
         }

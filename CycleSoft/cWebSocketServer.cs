@@ -34,7 +34,7 @@ namespace CycleSoft
                     socket.OnMessage = message =>
                         {
                             //Console.WriteLine(message);
-                            allSockets.ToList().ForEach(s => s.Send("Echo: " + message));
+                            // allSockets.ToList().ForEach(s => s.Send("Echo: " + message));
                         };
                 });
 

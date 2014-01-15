@@ -173,12 +173,16 @@ namespace CycleSoft
                 double ymin = 0;
                 double ymax = 1;
 
+                double target = 0;
+
                 if (bWorkoutRunning)
                 {
-                    y = workoutStatus.segmentCurrentTarget / 2;
-                    ymin = y - workoutStatus.pointsMinus / 2;
+                    target = activeWorkout.segments[workoutStatus.currentSegment].effort;
+                    if (workoutStatus.alternateTarget > 0) target = workoutStatus.alternateTarget;
+                    y = target / 2;
+                    ymin = y - activeWorkout.segments[workoutStatus.currentSegment].ptsMinus / 2;
                     if (ymin < 0) ymin = 0;
-                    ymax = y + workoutStatus.pointsPlus / 2;
+                    ymax = y + activeWorkout.segments[workoutStatus.currentSegment].ptsPlus / 2;
                     if (ymax > 1) ymax = 1;
                 }
                 else
@@ -215,10 +219,10 @@ namespace CycleSoft
                 y = 0;
                 if (bWorkoutRunning)
                 {
-                    y = (double)workoutStatus.segmentCadTarget / 150;
-                    ymin = y - (double)workoutStatus.pointsCadMinus / 150;
+                    y = (double)activeWorkout.segments[workoutStatus.currentSegment].cadTarget / 150;
+                    ymin = y - (double)activeWorkout.segments[workoutStatus.currentSegment].ptsCadMinus / 150;
                     if (ymin < 0) ymin = 0;
-                    ymax = y + (double)workoutStatus.pointsCadPlus / 150;
+                    ymax = y + (double)activeWorkout.segments[workoutStatus.currentSegment].ptsCadPlus / 150;
                     if (ymax > 1) ymax = 1;
                 }
                 else
@@ -284,13 +288,13 @@ namespace CycleSoft
                     extend_line(pwrline, dwgEngine.scaleLine(pwrData));
 
                     // send more Points to User. Note THIS REALLY DOESN"T BELONG HERE? :(
-                    double powerdiff = 2*(y - workoutStatus.segmentCurrentTarget/2);
-                    if (powerdiff < 0 && -powerdiff <= workoutStatus.pointsMinus)
+                    double powerdiff = 2 * (y - target / 2);
+                    if (powerdiff < 0 && -powerdiff <= activeWorkout.segments[workoutStatus.currentSegment].ptsMinus)
                     {
                         userStreamToClose.points += .5;
                         powerMeterCanvas.Background = new SolidColorBrush(Colors.Yellow);
                     }
-                    else if (powerdiff > 0 && powerdiff <= workoutStatus.pointsPlus)
+                    else if (powerdiff > 0 && powerdiff <= activeWorkout.segments[workoutStatus.currentSegment].ptsPlus)
                     {
                         userStreamToClose.points += 1;
                         powerMeterCanvas.Background = new SolidColorBrush(Colors.LightGreen);
@@ -298,15 +302,17 @@ namespace CycleSoft
                     else
                         powerMeterCanvas.Background = new SolidColorBrush(Colors.Black);
 
-                    if (cadInst >= workoutStatus.segmentCadTarget)
+                    if (cadInst >= activeWorkout.segments[workoutStatus.currentSegment].cadTarget)
                     {
-                        if (cadInst - workoutStatus.segmentCadTarget <= workoutStatus.pointsCadPlus)
+                        if (cadInst - activeWorkout.segments[workoutStatus.currentSegment].cadTarget <= 
+                            activeWorkout.segments[workoutStatus.currentSegment].ptsCadPlus)
                         {
                             userStreamToClose.points += 1;
                             cadMeterCanvas.Background = new SolidColorBrush(Colors.LightGreen);
                         }
                     }
-                    else if (workoutStatus.segmentCadTarget - cadInst <= workoutStatus.pointsCadMinus)
+                    else if (activeWorkout.segments[workoutStatus.currentSegment].cadTarget - cadInst <= 
+                        activeWorkout.segments[workoutStatus.currentSegment].ptsCadMinus)
                     {
                         userStreamToClose.points += .5;
                         cadMeterCanvas.Background = new SolidColorBrush(Colors.Yellow);

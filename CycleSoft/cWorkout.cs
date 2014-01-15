@@ -40,28 +40,8 @@ namespace CycleSoft
         public long workoutCurrentMS { get; set; }          // needed
         public long segmentTotalMS { get; set; }            // needed
         public long segmentCurrentMS { get; set; }          // needed
-        public double segmentCurrentTarget { get; set; }    // needed
-        public double pointsPlus { get; set; }
-        public double pointsMinus { get; set; }
-        public double segmentCadTarget { get; set; }    // needed
-        public double pointsCadPlus { get; set; }
-        public double pointsCadMinus { get; set; }
         public int currentSegment { get; set; }             // needed? Used in UserWindow for Points
-        public segmentDef currentSegmentDef { get; set; }
-        /*      public string segmentName;
-                public string type;
-                public double effort;
-                public double effortFinish;
-                public double ptsPlus;
-                public double ptsMinus;
-                public int cadTarget;
-                public int ptsCadPlus;
-                public int ptsCadMinus;
-                public long length;
-                public long underTime;
-                public long overTime;
-         */
-
+        public double alternateTarget { get; set; }      // used for RAMP or OverUnder
     }
 
     public class workoutStatusArgs : EventArgs
@@ -209,12 +189,9 @@ namespace CycleSoft
 
             workoutEventArgs wEA = getDefaultEventData();
             wEA.message = "Loading Workout " + activeWorkout.title;
-            wEA.segmentCurrentTarget = activeWorkout.segments[0].effort;
-            wEA.segmentCadTarget = activeWorkout.segments[0].cadTarget;
             wEA.segmentTotalMS = activeWorkout.segments[0].length*1000;
             wEA.workoutTotalMS = activeWorkout.length*1000;
             wEA.starting = true;
-            wEA.currentSegmentDef = activeWorkout.segments[0];
             workoutEventHandler(this, wEA);
             workOutSeconds = 0;
             return true;
@@ -231,19 +208,10 @@ namespace CycleSoft
 
             workoutEventArgs wEA = getDefaultEventData();
             wEA.message = "Starting " + activeWorkout.title + " in " + workoutCountDown.ToString() + " Seconds";
-            wEA.segmentCurrentTarget = activeWorkout.segments[0].effort;
-            wEA.pointsPlus = activeWorkout.segments[0].ptsPlus;
-            wEA.pointsMinus = activeWorkout.segments[0].ptsMinus;
-
-            wEA.segmentCadTarget = activeWorkout.segments[0].cadTarget;
-            wEA.pointsCadPlus = activeWorkout.segments[0].ptsCadPlus;
-            wEA.pointsCadMinus = activeWorkout.segments[0].ptsCadMinus;
 
             wEA.segmentTotalMS = activeWorkout.segments[0].length * 1000;
             wEA.workoutCurrentMS = 0;
             wEA.workoutTotalMS = activeWorkout.length*1000;
-
-            wEA.currentSegmentDef = activeWorkout.segments[0];
 
             workoutEventHandler(this, wEA);
 
@@ -309,29 +277,16 @@ namespace CycleSoft
             if (workoutCountDown > 0)
             {
                 wEA.message = "Starting "+activeWorkout.title + " in " + workoutCountDown.ToString() + " Seconds";
-                wEA.segmentCurrentTarget = activeWorkout.segments[0].effort;
-                wEA.pointsPlus = activeWorkout.segments[0].ptsPlus;
-                wEA.pointsMinus = activeWorkout.segments[0].ptsMinus;
-                wEA.segmentCadTarget = activeWorkout.segments[0].cadTarget;
-                wEA.pointsCadPlus = activeWorkout.segments[0].ptsCadPlus;
-                wEA.pointsCadMinus = activeWorkout.segments[0].ptsCadMinus;
                 wEA.segmentTotalMS = activeWorkout.segments[0].length * 1000;
-                wEA.currentSegmentDef = activeWorkout.segments[0];
                 wEA.workoutTotalMS = activeWorkout.length*1000;
             }
             else
             {
                 _countDownTimer.Stop();
                 activeSegment = 0;
+                wEA.currentSegment = activeSegment;
                 wEA.message = "GGGGOOOOOO!!!";
-                wEA.segmentCurrentTarget = activeWorkout.segments[0].effort;
-                wEA.pointsPlus = activeWorkout.segments[0].ptsPlus;
-                wEA.pointsMinus = activeWorkout.segments[0].ptsMinus;
-                wEA.segmentCadTarget = activeWorkout.segments[0].cadTarget;
-                wEA.pointsCadPlus = activeWorkout.segments[0].ptsCadPlus;
-                wEA.pointsCadMinus = activeWorkout.segments[0].ptsCadMinus;
                 wEA.segmentTotalMS = activeWorkout.segments[0].length * 1000;
-                wEA.currentSegmentDef = activeWorkout.segments[0];
                 wEA.workoutTotalMS = activeWorkout.length*1000;
 
                 workoutTime = new Stopwatch();
@@ -393,22 +348,13 @@ namespace CycleSoft
                 wEA.segmentCurrentMS = activeWorkout.segments[activeSegment].length*1000 - (msTimeForNextSegment - workoutTime.ElapsedMilliseconds);
                 wEA.segmentTotalMS = activeWorkout.segments[activeSegment].length*1000;
 
-                wEA.pointsPlus = activeWorkout.segments[activeSegment].ptsPlus;
-                wEA.pointsMinus = activeWorkout.segments[activeSegment].ptsMinus;
-                wEA.pointsCadPlus = activeWorkout.segments[activeSegment].ptsCadPlus;
-                wEA.pointsCadMinus = activeWorkout.segments[activeSegment].ptsCadMinus;
-                wEA.currentSegmentDef = activeWorkout.segments[activeSegment];
                 switch (activeWorkout.segments[activeSegment].type)
                 {
                     case "steady":
-                        wEA.segmentCurrentTarget = activeWorkout.segments[activeSegment].effort;
-                        wEA.segmentCadTarget = activeWorkout.segments[activeSegment].cadTarget;
-
                         break;
                     case "ramp":
-                        wEA.segmentCurrentTarget = activeWorkout.segments[activeSegment].effort +
+                        wEA.alternateTarget = activeWorkout.segments[activeSegment].effort +
                             ((double)wEA.segmentCurrentMS / wEA.segmentTotalMS)*(activeWorkout.segments[activeSegment].effortFinish - activeWorkout.segments[activeSegment].effort);
-                        wEA.segmentCadTarget = activeWorkout.segments[activeSegment].cadTarget;
                         break;
                     case "overunder":
                         long timeLeft = (msTimeForNextSegment - workoutTime.ElapsedMilliseconds)/1000;
@@ -416,23 +362,21 @@ namespace CycleSoft
                         {
                             if (timeLeft <= activeWorkout.segments[activeSegment].overTime)
                             {
-                                wEA.segmentCurrentTarget = activeWorkout.segments[activeSegment].effortFinish;
+                                wEA.alternateTarget = activeWorkout.segments[activeSegment].effortFinish;
                                 timeLeft = 0;
                             }
                             else timeLeft -= activeWorkout.segments[activeSegment].overTime;
 
                             if (timeLeft > 0 && timeLeft <= activeWorkout.segments[activeSegment].underTime)
                             {
-                                wEA.segmentCurrentTarget = activeWorkout.segments[activeSegment].effort;
+                                wEA.alternateTarget = activeWorkout.segments[activeSegment].effort;
                                 timeLeft = 0;
                             }
                             else timeLeft -= activeWorkout.segments[activeSegment].underTime;
                         }
-                        wEA.segmentCadTarget = activeWorkout.segments[activeSegment].cadTarget;
                         break;
                     default:
-                        wEA.segmentCurrentTarget = activeWorkout.segments[activeSegment].effort;
-                        wEA.segmentCadTarget = activeWorkout.segments[activeSegment].cadTarget;
+                        wEA.alternateTarget = 0;
                         break;
 
                 }    
@@ -472,14 +416,13 @@ namespace CycleSoft
             wEA.message = "";
             wEA.paused = bIsPaused;
             wEA.segmentCurrentMS = 0;
-            wEA.segmentCurrentTarget = 0;
-            wEA.segmentCadTarget = 80;
             wEA.segmentTotalMS = 0;
             wEA.starting = false;
             wEA.workoutCurrentMS = 0;
             wEA.workoutTotalMS = 0;
             wEA.currentSegment = activeSegment;
             wEA.running = bIsRunning;
+            wEA.alternateTarget = 0;
             return wEA;
         }
     }
