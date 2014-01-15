@@ -1,7 +1,7 @@
 ﻿<Window x:Class="CycleSoft.UserConfig"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Window2" Height="401" Width="294">
+        Title="Window2" Height="410.552" Width="282.059">
     <Grid>
         <TextBox Height="23" HorizontalAlignment="Left" Margin="12,12,0,0" Name="textBoxWheelSize" VerticalAlignment="Top" Width="90" ToolTip="&quot;This combination of ... results in these diameters (mm) ... Circumference" />
         <Button Content="Save Wheel Size" Height="23" HorizontalAlignment="Left" Margin="124,12,0,0" Name="buttonSaveWheelSize" VerticalAlignment="Top" Width="142" Click="buttonSaveWheelSize_Click" />
@@ -11,7 +11,7 @@
         <TextBox Height="23" HorizontalAlignment="Left" Margin="12,100,0,0" Name="textBox1" VerticalAlignment="Top" Width="254" Text="Select Trainer for Virt Power:" IsEnabled="False" />
         <TextBox Height="23" HorizontalAlignment="Left" Margin="12,71,0,0" Name="textBoxPowerAvgTime" VerticalAlignment="Top" Width="90" />
         <Button Content="Save Avg Filter Time" Height="23" HorizontalAlignment="Left" Margin="124,71,0,0" Name="buttonSaveAvgFilter" VerticalAlignment="Top" Width="142" Click="buttonSaveAvgFilter_Click" />
-        <Canvas Margin="42,187,7,35" Name="canvas1" Background="Black">
+        <Canvas Margin="12,187,7.4,34.8" Name="canvas1" Background="Black">
             <Path Stroke="#000000FF" StrokeThickness="0.5" Fill="SteelBlue">
                 <Path.Data>
                     <PathGeometry x:Name="polyline">
@@ -25,7 +25,7 @@
             </Path>
             <Label Canvas.Left="14" Canvas.Top="6" Content="Instructions" Height="30" Name="calInstructions" Width="204" Foreground="White" />
         </Canvas>
-        <TextBox Height="23" HorizontalAlignment="Left" IsEnabled="False" Margin="12,158,0,0" Name="calTitleBox" Text="Calibration:" VerticalAlignment="Top" Width="254" />
+        <TextBox Height="23" IsEnabled="False" Margin="12,158,10,0" Name="calTitleBox" Text="Calibration:" VerticalAlignment="Top" />
         <Button Content="Do Calibration" Height="23" Margin="12,0,0,3" Name="btnDoCalibration" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="116" Click="btnDoCalibration_Click" />
         <Button Content="Save Calibration" Height="23" Margin="0,0,9,3" Name="btnSaveCalibration" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="120" Click="btnSaveCalibration_Click" />
     </Grid>

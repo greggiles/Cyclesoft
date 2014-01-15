@@ -33,6 +33,7 @@ namespace CycleSoft
             comboBox1.SelectedIndex = targetUser.ptrSPwr;
             textBoxPowerAvgTime.Text = targetUser.avgPowerTime.ToString();
 
+
         }
 
         private void buttonSaveWheelSize_Click(object sender, RoutedEventArgs e)
@@ -188,7 +189,8 @@ namespace CycleSoft
         {
 
         }
-        
+
+
 
     }
 }

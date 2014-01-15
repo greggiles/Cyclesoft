@@ -462,6 +462,19 @@ namespace CycleSoft
         {
             activeWorkout = workout;
             draw_workout();
+
+            spdline.Clear();
+            cadline.Clear();
+            hrline.Clear();
+            pwrline.Clear();
+
+            spdData.Clear();
+            cadData.Clear();
+            hrData.Clear();
+            pwrData.Clear();
+
+
+
         }
         
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

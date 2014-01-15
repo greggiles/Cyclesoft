@@ -46,8 +46,8 @@
                     <Button Background="LightGreen" Content="Start" Height="38" Name="button_Start" VerticalAlignment="Top" Click="button_Start_Click" HorizontalAlignment="Left" Width="196" Margin="5,10,0,0" Grid.Row="1" />
                     <ComboBox Height="23" Margin="6,208,0,0" Name="cbSelectWorkout" VerticalAlignment="Top" Grid.Row="1" SelectionChanged="cbSelectWorkout_SelectionChanged" HorizontalAlignment="Left" Width="282" />
                     <Button Content="Start Workout" Height="23" Margin="293,208,0,0" Name="bStartWorkout" Click="bStartWorkout_Click" Grid.Row="1" MouseRightButtonUp="bStartWorkout_MouseRightButtonUp" IsEnabled="False" VerticalAlignment="Top" HorizontalAlignment="Left" Width="139" />
-                    <Button Content="Launch Selected Users" Height="23" HorizontalAlignment="Left" Margin="437,179,0,0" Name="buttonLaunchUsers" VerticalAlignment="Top" Width="139" Click="LaunchUserWindows" Grid.Row="1" />
-                    <Button Content="Remove Selected Users" Height="23" HorizontalAlignment="Left" Margin="5,179,0,0" Name="buttonRemoveUsers" VerticalAlignment="Top" Width="139" Click="buttonRemoveUsers_Click" Grid.Row="1" ToolTip="Remove User for this Run, will be back next time program runs" />
+                    <Button Content="Launch Selected Users" Height="23" HorizontalAlignment="Left" Margin="509,179,0,0" Name="buttonLaunchUsers" VerticalAlignment="Top" Width="139" Click="LaunchUserWindows" Grid.Row="1" />
+                    <Button Content="Remove Selected" Height="23" HorizontalAlignment="Left" Margin="5,179,0,0" Name="buttonRemoveUsers" VerticalAlignment="Top" Width="120" Click="buttonRemoveUsers_Click" Grid.Row="1" ToolTip="Remove User for this Run, will be back next time program runs" />
                     <Canvas Grid.Row="1" Margin="6,236,11.2,40.6" Name="polylineCanvas" Background="Black">
                         <Path Stroke="#000000FF" StrokeThickness="0.5" Fill="SteelBlue">
                             <Path.Data>
@@ -62,10 +62,11 @@
                         </Path>
                     </Canvas>
                     <Slider Grid.Row="1" Margin="5,0,11.2,8.6" Name="slider1" Value="1" SmallChange="0.1" SelectionStart="1" SelectionEnd="1" Maximum="2" Minimum="1" ValueChanged="slider1_ValueChanged" Height="27" VerticalAlignment="Bottom" />
-                    <Button Content="Save Selected Users" Grid.Row="1" Height="23" HorizontalAlignment="Left" Margin="292,179,0,0" Name="buttonSaveUser" VerticalAlignment="Top" Width="139" Click="buttonSaveUser_Click" />
+                    <Button Content="Save Selected Users" Grid.Row="1" Height="23" HorizontalAlignment="Left" Margin="255,179,0,0" Name="buttonSaveUser" VerticalAlignment="Top" Width="120" Click="buttonSaveUser_Click" />
                     <Label x:Name="lbl_ANTStatus" Content="" HorizontalAlignment="Left" Margin="220,16,0,0" Grid.RowSpan="2" VerticalAlignment="Top" Width="684"/>
-                    <Button Content="Delete Selected Users" Height="23" HorizontalAlignment="Left" Margin="149,179,0,0" x:Name="buttonDeleteUsers" VerticalAlignment="Top" Width="139" Click="buttonDeleteUsers_Click" Grid.Row="1" ToolTip="Permanently Delete User from System" />
+                    <Button Content="Delete Selected Users" Height="23" HorizontalAlignment="Left" Margin="130,179,0,0" x:Name="buttonDeleteUsers" VerticalAlignment="Top" Width="120" Click="buttonDeleteUsers_Click" Grid.Row="1" ToolTip="Permanently Delete User from System" />
                     <Button Content="End Workout" Height="23" Margin="437,208,0,0" x:Name="bEndWorkout" Click="bEndWorkout_Click" Grid.Row="1" MouseRightButtonUp="bStartWorkout_MouseRightButtonUp" IsEnabled="False" VerticalAlignment="Top" HorizontalAlignment="Left" Width="139" />
+                    <Button Content="Modify Selected User" Grid.Row="1" Height="23" HorizontalAlignment="Left" Margin="380,179,0,0" x:Name="buttonModUser" VerticalAlignment="Top" Width="120" Click="buttonModUser_Click" />
                 </Grid>
             </TabItem>
             <TabItem Header="User Config" Name="tabItem2">
@@ -120,6 +121,24 @@
                     <Button Content="Add User with Selected" HorizontalAlignment="Right" Margin="0,0.8,23.8,0" Name="buttonAddUser" Width="139" Click="buttonAddUser_Click" Grid.Column="1" Grid.Row="3" Height="23" VerticalAlignment="Top" />
                 </Grid>
             </TabItem>
+            <TabItem Header="Workout Config" Name="tabItem3">
+                <Grid>
+                    <ComboBox Height="23" x:Name="cbSelectEditWorkout" VerticalAlignment="Top" SelectionChanged="cbSelectEditWorkout_SelectionChanged" HorizontalAlignment="Left" Width="282" />
+                    <Canvas x:Name="polylineEditCanvas" Background="Black" Width="642" Margin="9,28,8.2,250.6">
+                        <Path Stroke="#000000FF" StrokeThickness="0.5" Fill="SteelBlue">
+                            <Path.Data>
+                                <PathGeometry x:Name="polyline1">
+                                    <PathGeometry.Transform>
+                                        <ScaleTransform
+            						ScaleX="{Binding ActualWidth, ElementName=polylineEditCanvas}"
+            						ScaleY="{Binding ActualHeight, ElementName=polylineEditCanvas}"/>
+                                    </PathGeometry.Transform>
+                                </PathGeometry>
+                            </Path.Data>
+                        </Path>
+                    </Canvas>
+                </Grid>
+            </TabItem>
             <TabItem Header="Video" Name="tabItem4">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -138,7 +157,7 @@
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="Auto" MinWidth="300"/>
                     </Grid.ColumnDefinitions>
-                    <MediaElement Margin="5,6,6,0" Name="mediaElement1" Source="C:\Users\ggiles\Videos\SufferfestDownwardSpiral.mp4" UnloadedBehavior="Manual" LoadedBehavior="Manual" MinHeight="200" Grid.ColumnSpan="2" MediaOpened="mediaElement1_MediaOpened" Stretch="Fill" Grid.RowSpan="7" />
+                    <MediaElement Margin="5,6,6,0" Name="mediaElement1" Source="" UnloadedBehavior="Manual" LoadedBehavior="Manual" MinHeight="200" Grid.ColumnSpan="2" MediaOpened="mediaElement1_MediaOpened" Stretch="Fill" Grid.RowSpan="7" />
                     <Button Content="Start Workout" Height="32" HorizontalAlignment="Left" Margin="5,0,0,6.4" Name="bStartWorkout2" VerticalAlignment="Bottom" Width="104" Click="bStartWorkout_Click" Grid.Row="7" />
                     <Button Content="End Workout" Height="32" HorizontalAlignment="Left" Margin="114,0,0,6.4" Name="bEndWorkout2" VerticalAlignment="Bottom" Width="92" Click="bEndWorkout_Click" Grid.Row="7" />
                     <CheckBox Content="Mute" Grid.Row="7" Height="16" HorizontalAlignment="Left" Margin="220,0,0,10.4" Name="checkBox1" VerticalAlignment="Bottom" Checked="checkBox1_Checked" Unchecked="checkBox1_Unchecked" />

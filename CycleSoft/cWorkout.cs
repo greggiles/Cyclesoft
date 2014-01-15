@@ -82,6 +82,7 @@ namespace CycleSoft
 
         public int workOutSeconds { get; private set; }
 
+        private string workoutPath;
 
         public cWorkout()
         {
@@ -98,7 +99,11 @@ namespace CycleSoft
 
             bIsRunning = false;
             workOutSeconds = 0;
-            workoutFileArray = Directory.GetFiles(".\\workouts\\", "*.xml");
+
+            workoutPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "CycleSoft\\Workouts\\");
+            Directory.CreateDirectory(workoutPath);
+            workoutFileArray = Directory.GetFiles(workoutPath, "*.xml");
+
             for (int i = 0; i < workoutFileArray.Length; i++)
             {
                 Stream workOutContents = File.Open(workoutFileArray[i],FileMode.Open);

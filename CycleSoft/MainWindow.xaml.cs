@@ -62,8 +62,11 @@ namespace CycleSoft
 
             theServer = new cWebSocketServer();
 
-            for(int i=0; i<WorkoutHandler.workOutList.Count; i++)
+            for (int i = 0; i < WorkoutHandler.workOutList.Count; i++)
+            {
                 cbSelectWorkout.Items.Add(WorkoutHandler.workOutList[i].title);
+                cbSelectEditWorkout.Items.Add(WorkoutHandler.workOutList[i].title);
+            }
 
             WorkoutHandler.workoutEventStartStop += updateWorkoutEvent;
 
@@ -73,15 +76,19 @@ namespace CycleSoft
 
             dataGridUsers.DataContext = UserHandler.l_Users;
 
-            Timer _timer = new Timer(200);
+            Timer _timer = new Timer(500);
             _timer.Elapsed += new ElapsedEventHandler(_timerElapsed);
             _timer.Enabled = true;
+
+
+            lbl_ANTStatus.Content = "ANT Device not Found, installing or disabling Garmin Agent, then press \"Start\"";
 
             if (AntHandler.startUp())
             {
                 AntHandler.channelMessageHandler += StreamHandler.handleAntData;
                 button_Start.Background = System.Windows.Media.Brushes.Salmon;
                 button_Start.Content = "ANT ENABLED";
+                lbl_ANTStatus.Content = "Press \"ANT ENABLED\" button to stop";
             }
             bStartWorkout.IsEnabled = false;
             bStartWorkout2.IsEnabled = false;
@@ -117,7 +124,7 @@ namespace CycleSoft
             
             button_Start.Background = System.Windows.Media.Brushes.LightGreen;
             button_Start.Content = "Start";
-            lbl_ANTStatus.Content = "ANT Device not Found, try installing or disabling Garmin Agent, then press \"Start\"";
+            lbl_ANTStatus.Content = "ANT Device not Found, installing or disabling Garmin Agent, then press \"Start\"";
 
         }
 
@@ -143,13 +150,9 @@ namespace CycleSoft
             webdata += ((double)userWindows[userWin].userStreamToClose.instPower / userWindows[userWin].userStreamToClose.ftp).ToString();
             webdata += "'></progress>";
 
-            
-            if (upp.textBox_FirstUser1.Text != userWindows[userWin].userStreamToClose.firstName)
-            {
-                upp.Visibility = Visibility.Visible;
-                upp.textBox_FirstUser1.Text = userWindows[userWin].userStreamToClose.firstName;
-                upp.textBox_LastUser1.Text = userWindows[userWin].userStreamToClose.lastName;
-            }
+            upp.Visibility = Visibility.Visible;
+            upp.textBox_FirstUser1.Text = userWindows[userWin].userStreamToClose.firstName;
+            upp.textBox_LastUser1.Text = userWindows[userWin].userStreamToClose.lastName;
 
             upp.textBox_HRUser1.Text = userWindows[userWin].userStreamToClose.hr.ToString();
             upp.textBox_PwrUser1.Text = userWindows[userWin].userStreamToClose.instPower.ToString();
@@ -166,7 +169,7 @@ namespace CycleSoft
 
             if (userWindows[userWin].pwrline.Figures.Count > upp.pwrline.Figures.Count)
             {
-                for (int i = upp.pwrline.Figures.Count; i <= userWindows[userWin].pwrline.Figures.Count; i++)
+                for (int i = upp.pwrline.Figures.Count; i < userWindows[userWin].pwrline.Figures.Count; i++)
                 {
                     upp.pwrline.Figures.Add(userWindows[userWin].pwrline.Figures[i]);
                 }
@@ -174,7 +177,7 @@ namespace CycleSoft
             
             if (userWindows[userWin].spdline.Figures.Count > upp.spdline.Figures.Count)
             {
-                for (int i = upp.spdline.Figures.Count; i <= userWindows[userWin].spdline.Figures.Count; i++)
+                for (int i = upp.spdline.Figures.Count; i < userWindows[userWin].spdline.Figures.Count; i++)
                 {
                     upp.spdline.Figures.Add(userWindows[userWin].spdline.Figures[i]);
                 }
@@ -409,7 +412,13 @@ namespace CycleSoft
             bEndWorkout2.Content = "End Workout";
         }
 
-
+        private void cbSelectEditWorkout_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (cbSelectEditWorkout.SelectedIndex >= 0)
+            {
+                drawLocalChart(cbSelectEditWorkout.SelectedIndex, polyline1);
+            }
+        }
         private void cbSelectWorkout_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (cbSelectWorkout.SelectedIndex >= 0)
@@ -428,6 +437,18 @@ namespace CycleSoft
                         userPointPanel2.polylineCanvas.Width = WorkoutHandler.activeWorkout.length;
                         userPointPanel3.polylineCanvas.Width = WorkoutHandler.activeWorkout.length;
                         userPointPanel4.polylineCanvas.Width = WorkoutHandler.activeWorkout.length;
+
+                        userPointPanel1.pwrline.Clear();
+                        userPointPanel2.pwrline.Clear();
+                        userPointPanel3.pwrline.Clear();
+                        userPointPanel4.pwrline.Clear();
+
+                        userPointPanel1.spdline.Clear();
+                        userPointPanel2.spdline.Clear();
+                        userPointPanel3.spdline.Clear();
+                        userPointPanel4.spdline.Clear();
+
+
                     }));
 
                     if (null == WorkoutHandler.workOutList[cbSelectWorkout.SelectedIndex].videopath)
@@ -439,24 +460,26 @@ namespace CycleSoft
                         var converted = uri.AbsoluteUri;
                         mediaElement1.Source = uri;
                     }
-                    drawLocalChart();
+                    drawLocalChart(cbSelectWorkout.SelectedIndex, polyline);
                 }
             }
         }
-        private void drawLocalChart()
+        private void drawLocalChart(int Selected, PathGeometry target)
         {
-            Point[] currentWorkoutPoints = drawingEngine.getWorkoutPoints(WorkoutHandler.workOutList[cbSelectWorkout.SelectedIndex]);
+            if (Selected < 0 || Selected >= WorkoutHandler.workOutList.Count)
+                return;
+            Point[] currentWorkoutPoints = drawingEngine.getWorkoutPoints(WorkoutHandler.workOutList[Selected]);
             var figure = new PathFigure
             {
                 StartPoint = currentWorkoutPoints[0],
                 IsClosed = true
             };
 
-            polyline.Figures.Clear();
+            target.Figures.Clear();
 
             var segment = new PolyLineSegment(currentWorkoutPoints.Skip(1), true);
             figure.Segments.Add(segment);
-            polyline.Figures.Add(figure);
+            target.Figures.Add(figure);
 
         }
 
@@ -469,7 +492,7 @@ namespace CycleSoft
         {
             this.drawingEngine.chartZoom = slider1.Value;
             if (cbSelectWorkout.SelectedIndex >= 0)
-                drawLocalChart();
+                drawLocalChart(cbSelectWorkout.SelectedIndex, polyline);
 
             if (userWindows != null)
             {
@@ -545,7 +568,12 @@ namespace CycleSoft
             textBoxFTP.SelectAll();
         }
 
- 
+        private void buttonModUser_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBoxResult result = MessageBox.Show("Not Done Yet. Intent to go to User Config Tab Automatically with selections made, and button changed to \"mod\" user."); 
+            
+        }
+
 
     }
 

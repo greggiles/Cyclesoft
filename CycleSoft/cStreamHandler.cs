@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows.Data;
 
 namespace CycleSoft
 {
@@ -10,15 +12,23 @@ namespace CycleSoft
         static readonly int pUID = 9;
         static readonly int pTYPE = 12;
 
-        public List<powerStream> pwrStreams;
-        public List<hbStream> hbStreams;
-        public List<spdStream> spdStreams;
+        public ObservableCollection<powerStream> pwrStreams;
+        public ObservableCollection<hbStream> hbStreams;
+        public ObservableCollection<spdStream> spdStreams;
+
+        public static object _pwrsyncLock = new object();
+        public static object _hbsyncLock = new object();
+        public static object _spdsyncLock = new object();
 
         public cStreamHandler()
         {
-            pwrStreams = new List<powerStream>();
-            hbStreams = new List<hbStream>();
-            spdStreams = new List<spdStream>();
+            pwrStreams = new ObservableCollection<powerStream>();
+            hbStreams = new ObservableCollection<hbStream>();
+            spdStreams = new ObservableCollection<spdStream>();
+
+            BindingOperations.EnableCollectionSynchronization(pwrStreams, _pwrsyncLock);
+            BindingOperations.EnableCollectionSynchronization(hbStreams, _hbsyncLock);
+            BindingOperations.EnableCollectionSynchronization(spdStreams, _spdsyncLock);
 
         }
 
@@ -179,7 +189,9 @@ namespace CycleSoft
 
         void heartBeatLost(object sender, EventArgs e)
         {
+         
             dataStream received = (dataStream)sender;
+
             switch (received.sensorType)
             {
                 case (byte)sensorTypes.HeartRate:
@@ -221,8 +233,9 @@ namespace CycleSoft
                 default:
                     break;
             }
+ 
         }
 
-
+   
     }
 }
