@@ -3,8 +3,11 @@ using System.Configuration;
 using System.IO;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Reflection;
 using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
@@ -18,6 +21,11 @@ using System.Windows.Shapes;
 using System.Xml;
 using System.Xml.XPath;
 using Newtonsoft.Json;
+using System.Net;
+using System.Net.Sockets;
+//using System.Runtime.InteropServices;
+
+
 
 namespace CycleSoft
 {
@@ -40,14 +48,47 @@ namespace CycleSoft
 
         private bool b_hasVid;
 
-
+        
         private cWebSocketServer theServer;
+        private int clientCount; 
+
         public class JsonData
         {
             public workoutEventArgs wEA { get; set; }
             public List<userEventArgs> uEAs { get; set; }
         }
 
+/*
+ *      [DllImport("user32.dll")]
+        public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
+        [DllImport("user32.dll", SetLastError = true)]  
+        static extern IntPtr FindWindowEx(IntPtr hwndParent, IntPtr hwndChildAfter, string lpszClass, string lpszWindow);          
+        [DllImport("user32.dll")]
+        public static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+        [DllImport("user32.dll")]
+        public static extern IntPtr PostMessage(IntPtr hWnd, uint Msg, Int32 wParam, Int32 lParam);
+        */
+        Process webProcess;
+
+        const uint WM_KEYDOWN = 0x100;
+        const uint WM_SYSCOMMAND = 0x018;
+        const uint SC_CLOSE = 0x053;
+
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e);
+            // This doesn't work, becuase the process was launched with Elevated Privledges
+
+            /*
+            if (webProcess != null)
+            {
+                IntPtr h = webProcess.MainWindowHandle;
+                IntPtr editHandle = FindWindowEx(h, IntPtr.Zero, "EDIT", null);
+                PostMessage(editHandle, WM_KEYDOWN, 'Q', 0);
+            }
+            */
+            Application.Current.Shutdown();
+        }
         public MainWindow()
         {
 
@@ -69,7 +110,60 @@ namespace CycleSoft
             WorkoutHandler = new cWorkout();
 
             theServer = new cWebSocketServer();
+            clientCount = 0;
+
+            // For IIS Express, this updates the applicationhost.config file, so that we know we run 
+            // from the same directory the program is running. What a PIA
+            string IISExpressFile = "C:\\Program Files\\IIS Express\\iisexpress.exe";
+            if (!System.IO.File.Exists(IISExpressFile))
+            {
+                AutoClosingMessageBox.Show("To Use web features, install IISExpress from Microsoft", "Webservice Error", 3000);
+            }
+            else
+            {
+                string filename = "applicationhost.config";
+                if (System.IO.File.Exists(filename))
+                {
+                    XmlDocument doc = new XmlDocument();
+                    doc.Load(filename);
+                    XmlAttribute path = (XmlAttribute)doc.SelectSingleNode("//configuration/system.applicationHost/sites/site/application/virtualDirectory/@physicalPath");
+                    //path.InnerText = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location).Replace(@"\", @"\\") + "\\\\web";
+                    path.InnerText = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location) + "\\web";
+                    doc.Save(filename);
+                }
+
+                List<string> knownAddresses = new List<string>();
+                IPHostEntry host;
+                host = Dns.GetHostEntry(Dns.GetHostName());
+                foreach (IPAddress ip in host.AddressList)
+                {
+                    if (ip.AddressFamily == AddressFamily.InterNetwork)
+                    {
+                        knownAddresses.Add("http://" + ip.ToString() + ":8080/");
+                    }
+                }
+                knownAddresses.Add("http://localhost" + ":8080/");
+
+                StringBuilder Message = new StringBuilder("Now Accepting Web Connections at:\n");
+                foreach (string url in knownAddresses) Message.AppendLine(url);
+
+
+
+                // Create Rules and Open Firewalls and Start IIS Express
+                ProcessStartInfo p1 = new ProcessStartInfo("LaunchWeb.bat", System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location).Replace(@"\", @"/"));
+                p1.UseShellExecute = true;
+                p1.WindowStyle = ProcessWindowStyle.Minimized;
+                p1.Verb = "runas";
+                try
+                {
+                    webProcess = Process.Start(p1);
+                    AutoClosingMessageBox.Show(Message.ToString(), "Web Server Running", 2500);
+                }
+                catch
+                { MessageBox.Show("Failed to start WebProcess"); }
+            }
             
+
             for (int i = 0; i < WorkoutHandler.workOutList.Count; i++)
             {
                 cbSelectWorkout.Items.Add(WorkoutHandler.workOutList[i].title);
@@ -293,7 +387,18 @@ namespace CycleSoft
                             var json = JsonConvert.SerializeObject(toSend,
                                 new JsonSerializerSettings() { Formatting = Newtonsoft.Json.Formatting.None });
 
-                            theServer.senddata(json);
+                            int newCount = theServer.senddata(json);
+                            if(newCount != clientCount)
+                            {
+                                clientCount = newCount;
+                                if (clientCount>0)
+                                {
+                                    json = JsonConvert.SerializeObject(WorkoutHandler.activeWorkout,
+                                        new JsonSerializerSettings() { Formatting = Newtonsoft.Json.Formatting.None });
+
+                                    theServer.senddata(json);
+                                }
+                            }
                         }
 
 
@@ -330,22 +435,25 @@ namespace CycleSoft
 
             for (int i = 0; i < dataGridUsers.SelectedItems.Count; i++)
             {
-                cAntUsers tempUser = (cAntUsers)dataGridUsers.SelectedItems[i];
-                UserWindow childWin = new UserWindow();
+                if (i < UserHandler.l_Users.Count)
+                {
+                    cAntUsers tempUser = (cAntUsers)dataGridUsers.SelectedItems[i];
+                    UserWindow childWin = new UserWindow();
 
-                tempUser.userUpdateHandler += childWin.updateEvent;
-                // this should go away. Everything that happens below should probably go to 
-                // the tempUser update, and the above event should pass whatever is required.
-                WorkoutHandler.workoutEventHandler += childWin.updateWorkoutEvent;
-                // The below should handle most of the above.
-                WorkoutHandler.workoutEventHandler += tempUser.updateWorkoutEvent;
+                    tempUser.userUpdateHandler += childWin.updateEvent;
+                    // this should go away. Everything that happens below should probably go to 
+                    // the tempUser update, and the above event should pass whatever is required.
+                    WorkoutHandler.workoutEventHandler += childWin.updateWorkoutEvent;
+                    // The below should handle most of the above.
+                    WorkoutHandler.workoutEventHandler += tempUser.updateWorkoutEvent;
 
 
-                userWindows.Add(childWin);
-                childWin.setTitle(tempUser.firstName + " " + tempUser.lastName, (int)(tempUser.ftp*2));
-                childWin.Activate();
-                childWin.Closed += new EventHandler(UserWnd_Closed);
-                childWin.Show();
+                    userWindows.Add(childWin);
+                    childWin.setTitle(tempUser.firstName + " " + tempUser.lastName, (int)(tempUser.ftp * 2));
+                    childWin.Activate();
+                    childWin.Closed += new EventHandler(UserWnd_Closed);
+                    childWin.Show();
+                }
             }
 
         }
@@ -604,6 +712,35 @@ namespace CycleSoft
         }
 
 
+    }
+
+    public class AutoClosingMessageBox
+    {
+        System.Threading.Timer _timeoutTimer;
+        string _caption;
+        AutoClosingMessageBox(string text, string caption, int timeout)
+        {
+            _caption = caption;
+            _timeoutTimer = new System.Threading.Timer(OnTimerElapsed,
+                null, timeout, System.Threading.Timeout.Infinite);
+            MessageBox.Show(text, caption);
+        }
+        public static void Show(string text, string caption, int timeout)
+        {
+            new AutoClosingMessageBox(text, caption, timeout);
+        }
+        void OnTimerElapsed(object state)
+        {
+            IntPtr mbWnd = FindWindow(null, _caption);
+            if (mbWnd != IntPtr.Zero)
+                SendMessage(mbWnd, WM_CLOSE, IntPtr.Zero, IntPtr.Zero);
+            _timeoutTimer.Dispose();
+        }
+        const int WM_CLOSE = 0x0010;
+        [System.Runtime.InteropServices.DllImport("user32.dll", SetLastError = true)]
+        static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
+        [System.Runtime.InteropServices.DllImport("user32.dll", CharSet = System.Runtime.InteropServices.CharSet.Auto)]
+        static extern IntPtr SendMessage(IntPtr hWnd, UInt32 Msg, IntPtr wParam, IntPtr lParam);
     }
 
 }

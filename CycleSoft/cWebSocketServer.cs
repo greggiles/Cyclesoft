@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using Fleck;
@@ -11,7 +13,7 @@ namespace CycleSoft
     {
         private WebSocketServer server;
         private List<IWebSocketConnection> allSockets;
-
+        public int clientCount { get; private set; }
         public cWebSocketServer()
         {   
             FleckLog.Level = LogLevel.Debug;
@@ -33,6 +35,16 @@ namespace CycleSoft
                         };
                     socket.OnMessage = message =>
                         {
+                         /*   var assembly = Assembly.GetExecutingAssembly();
+                            var resourceName = "CycleSoft.client.html";
+                            string[] result = assembly.GetManifestResourceNames();
+
+                            Stream stream = assembly.GetManifestResourceStream(resourceName);
+                            StreamReader reader = new StreamReader(stream);
+
+                            socket.Send(reader.ReadToEnd());
+                          */
+                            // return test;
                             //Console.WriteLine(message);
                             // allSockets.ToList().ForEach(s => s.Send("Echo: " + message));
                         };
@@ -50,13 +62,13 @@ namespace CycleSoft
                 // input = Console.ReadLine();
             }
             */
-        public void senddata(String sendme)
+        public int senddata(String sendme)
         {
                 foreach (var socket in allSockets.ToList())
                 {
                     socket.Send(sendme);
                 }
-            
+                return allSockets.Count;
         }
     }
 

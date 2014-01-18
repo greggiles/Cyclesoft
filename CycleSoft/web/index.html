@@ -1,0 +1,49 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+    <link type="text/css" rel="stylesheet" href="stylesheet.css" />
+    <!--iphone tags-->
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta name="viewport" content="maximum-scale=1.0">
+    <meta name="viewport" content="user-scalable=no">
+    <meta name="viewport" content="width=device-width">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="apple-touch-icon-precomposed" href="images/MadAnthony.png">
+    <link rel="apple-touch-startup-image" href="images/MadAnthonySP.png">
+
+    <title>WorkoutTracker by CycleSoft WebClient</title>
+
+    <script type="text/javascript" src="js/websocket.js"></script>
+</head>
+<body>
+    <script>
+        if (window.navigator.userAgent.indexOf('iPhone') != -1) {
+            if (window.navigator.standalone == true) {
+                initialize();
+            } else {
+                document.write('<p>Tap the + button and choose "Add to Home Screen"</p>');
+            }
+        }
+    </script>
+
+    <div id="header">
+
+    </div>
+    <div id="body">
+    </div>
+    <div id="footer">
+    </div>
+
+    Raw Incoming Data:<br />
+    <pre id="incoming"></pre>
+    <br />
+    Workout Status Data:<br />
+    <pre id="WorkoutStatus"></pre>
+    <br />
+    User Status Data:<br />
+    <pre id="UserStatus"></pre>
+    <br />
+    Workout Def Data:<br />
+    <pre id="WorkoutDef"></pre>
+</body>
+</html>
