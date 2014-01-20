@@ -4,7 +4,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Drawing;
+//using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Reflection;
@@ -532,7 +532,7 @@ namespace CycleSoft
             cbSelectWorkout.SelectedIndex = -1;
 
             WorkoutHandler.finish();
-            WorkoutHandler.resetWorkout();
+            //WorkoutHandler.resetWorkout();
             
             bStartWorkout.IsEnabled = false;
             bStartWorkout2.IsEnabled = false;

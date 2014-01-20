@@ -1,0 +1,122 @@
+* {
+	/*
+	border: 1px dashed blue;
+	*/
+	margin: 0px;	
+	padding: 0px;
+	text-align:center
+}
+
+.gLine {
+    width: 100%;
+	display: -moz-box;
+    -moz-box-orient: horizontal;
+    -moz-box-pack: start;
+    -moz-box-align: baseline;
+    display: -webkit-box;
+    -webkit-box-orient: horizontal;
+    -webkit-box-pack: start;
+    -webkit-box-align: baseline;
+    padding: 0px;
+    /*background-color: #1B1; */
+    margin: 1px;	
+	overflow: hidden;
+	border-radius: 3px;
+	/*Add your CSS here!*/
+}
+.gSpace {
+    -moz-box-flex: 1;
+    -webkit-box-flex: 1;
+}	
+.gLabel {
+	width: 30%;
+	font-size: 1em;
+	border: 1px solid black;
+	border-radius: 3px;
+}
+
+.gData {
+	width: 30%;
+	font-size: 3em;
+	border-radius: 3px;
+	border: 1px solid black;
+}
+.gInd {
+    width: 100%;
+	height: 80px;
+	display: -moz-box;
+    -moz-box-orient: horizontal;
+    -moz-box-pack: start;
+    -moz-box-align: baseline;
+    display: -webkit-box;
+    -webkit-box-orient: horizontal;
+    -webkit-box-pack: start;
+    -webkit-box-align: baseline;
+    padding: 0px;
+    background-color: #AAA;
+    margin: 0px;	
+	overflow: hidden;
+	font-size: 0;
+	border-radius: 3px;
+	border: 1px solid black;
+
+}
+.gPowCur {
+	margin: 0px;
+	padding-right: 2px;
+}
+.gPowNext {
+	margin: 0px;
+	padding: 0px;
+    background-color: blue;
+}
+
+.gTime {
+    width: 100%;
+    display: -moz-box;
+    -moz-box-orient: horizontal;
+    -moz-box-pack: center;
+    -moz-box-align: center;
+    display: -webkit-box;
+    -webkit-box-orient: horizontal;
+    -webkit-box-pack: center;
+    -webkit-box-align: center;
+    padding: 0px;
+/*    background-color: #DDD; */
+    margin: 1px;
+	border: 1px solid black;
+	border-radius: 3px;}	
+.gTimeLabel {
+}	
+
+.gTimeTime {
+	vertical-align:middle; 
+	font-size:2em;
+}	
+
+
+
+.gInd {
+	margin: 0px;
+}
+
+/*
+#header {
+	height: 50px;
+	background-color: #0000FF;
+	color: white;
+    font-size: 1em;
+}
+
+#body {
+	background-color: green;
+	color: red;
+	display: inline-block;
+    font-size: 4em;
+}
+
+#footer {
+	height: 50px;
+	background-color: #FFD700;
+}
+*/

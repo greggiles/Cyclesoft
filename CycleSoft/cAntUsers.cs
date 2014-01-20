@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Timers;
+using System.Windows;
 using System.Windows.Documents;
 using System.Xml;
 using System.Xml.XPath;
@@ -207,9 +208,12 @@ namespace CycleSoft
             }
             catch
             {
+                MessageBox.Show("Failed to peek at tcx Data");
                 return;
             }
-            Stream tcxOutContents = File.Open(firstName+"_"+lastName+"_"+point.timeStamp.ToString("yyyyddmm")+".tcx", FileMode.CreateNew);
+            string userPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "CycleSoft\\TCXFiles\\");
+            Directory.CreateDirectory(userPath);
+            Stream tcxOutContents = File.Open(userPath + firstName + "_" + lastName + "_" + point.timeStamp.ToString("yyyyddhh") + ".tcx", FileMode.CreateNew);
             StreamWriter tcxStreamWrite = new StreamWriter(tcxOutContents);
             tcxStreamWrite.WriteLine("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
             tcxStreamWrite.WriteLine("<TrainingCenterDatabase xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xsi:schemaLocation=\"http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2 http://www.garmin.com/xmlschemas/TrainingCenterDatabasev2.xsd\" xmlns:ns5=\"http://www.garmin.com/xmlschemas/ActivityGoals/v1\" xmlns:ns3=\"http://www.garmin.com/xmlschemas/ActivityExtension/v2\" xmlns:ns2=\"http://www.garmin.com/xmlschemas/UserProfile/v2\" xmlns=\"http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:ns4=\"http://www.garmin.com/xmlschemas/ProfileExtension/v1\">");

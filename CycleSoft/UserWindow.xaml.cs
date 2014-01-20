@@ -69,6 +69,7 @@ namespace CycleSoft
                     if (workoutStatus.finished)
                     {
                         bWorkoutRunning = false;
+                        textBlockWorkout.Text = "FINISHED";
                     }
 
                     //TimeSpan duration = new TimeSpan(0, 0, 0, (int)((workoutStatus.workoutTotalMS - workoutStatus.workoutCurrentMS) / 1000));
@@ -79,7 +80,7 @@ namespace CycleSoft
                     duration = new TimeSpan(0, 0, 0, (int)((999 + workoutStatus.segmentTotalMS - workoutStatus.segmentCurrentMS) / 1000));
                     textBoxSegmentTime.Text = duration.ToString(@"h\:mm\:ss");
 
-                    if (workoutStatus.paused)
+                    if (workoutStatus.paused && !workoutStatus.finished)
                     {
                         bWorkoutRunning = false;
                         textBlockWorkout.Text = "PAUSED";

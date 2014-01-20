@@ -1,7 +1,17 @@
-﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+﻿<!DOCTYPE html>
 <html>
 <head>
-    <link type="text/css" rel="stylesheet" href="stylesheet.css" />
+    <link type="text/css" rel="stylesheet" href="./jquery.mobile-1.3.2.min.css" />
+    <link type="text/css" rel="stylesheet" href="./stylesheet.css" />
+    <script type="text/javascript" src="./js/websocket.js"></script>
+    <script type="text/javascript" src="./js/jquery.mobile-1.3.2.min.js"></script>
+    <script type="text/javascript" src="js/jquery-1.8.3.min.js"></script>
+
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css">
+    <script src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
+    <script src="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script>
+
+
     <!--iphone tags-->
     <meta name="viewport" content="initial-scale=1.0">
     <meta name="viewport" content="maximum-scale=1.0">
@@ -13,37 +23,181 @@
 
     <title>WorkoutTracker by CycleSoft WebClient</title>
 
-    <script type="text/javascript" src="js/websocket.js"></script>
 </head>
+
+<script>
+    $(document).on("pageinit", "#pageone", function () {
+        $("div").on("swipeleft", function () {
+            window.location.href = "./#pagetwo";
+        });
+    });
+
+    $(document).on("pageinit", "#pagetwo", function () {
+        $("div").on("swiperight", function () {
+            window.location.href = "./";
+        });
+        $("div").on("swipeleft", function () {
+            window.location.href = "./#pagethree";
+        });
+    });
+
+    $(document).on("pageinit", "#pagethree", function () {
+        $("div").on("swiperight", function () {
+            window.location.href = "./#pagetwo";
+        });
+    });
+
+
+</script>
+
 <body>
-    <script>
-        if (window.navigator.userAgent.indexOf('iPhone') != -1) {
-            if (window.navigator.standalone == true) {
-                initialize();
-            } else {
-                document.write('<p>Tap the + button and choose "Add to Home Screen"</p>');
-            }
-        }
-    </script>
 
-    <div id="header">
+    <div data-role="page" id="pageone">
+        <div data-role="header">
+            <h1>WorkoutTracker</h1>
+        </div>
 
-    </div>
-    <div id="body">
-    </div>
-    <div id="footer">
+        <div data-role="content">
+            <div style="margin-top:-15px; font-size:1.5em"><span id="workoutName">WORKOUT - </span><span id="userName">First Last</span></div>
+
+            <div class="gLine" id="PowerLabels">
+                <div class="gLabel" id="powerLabel">Pwr Actual</div>
+                <div class="gLabel" id="powerLabel">Pwr Target</div>
+                <div class="gSpace"></div>
+                <div class="gLabel" id="powerLabel">Pwr Last</div>
+            </div>
+            <div class="gLine" id="PowerData">
+                <div class="gData" id="powerAct">123</div>
+                <div class="gData" id="powerTar">245</div>
+                <div class="gSpace"></div>
+                <div class="gData" id="powerLast">145</div>
+            </div>
+            <div class="gInd" id="powerTarInd">
+                <!-- workaround to get everything to the bottom -->
+                <div class="gPowNext" style="width:0; height:80px;"></div>
+                <div class="gPowCur" id="powerIndCur" style="width:50px; height:50%;"></div>
+                <div class="gPowCur" id="powerIndSpace" style="width:3px; height:0%;"></div>
+                <div class="gPowNext" id="powerIndNext1" style="width:60px; height:20%;"></div>
+                <div class="gPowNext" id="powerIndNext2" style="width:60px; height:40%;"></div>
+                <div class="gPowNext" id="powerIndNext3" style="width:60px; height:50%;"></div>
+                <div class="gPowNext" id="powerIndNext4" style="width:60px; height:20%;"></div>
+                <div class="gPowNext" id="powerIndNext5" style="width:20px; height:40%;"></div>
+                <div class="gPowNext" id="powerIndNext6" style="width:50px; height:50%;"></div>
+                <div class="gPowNext" id="powerIndNext7" style="width:30px; height:20%;"></div>
+                <div class="gPowNext" id="powerIndNext8" style="width:20px; height:40%;"></div>
+                <div class="gPowNext" id="powerIndNext9" style="width:50px; height:50%;"></div>
+            </div>
+
+            <div class="gLine" id="cadLabels">
+                <div class="gLabel" id="cadLabel">CAD Actual</div>
+                <div class="gLabel" id="cadLabel">CAD Target</div>
+                <div class="gSpace"></div>
+                <div class="gLabel" id="hrLabel">Heart Rate</div>
+            </div>
+            <div class="gLine" id="PowerData">
+                <div class="gData" id="cadAct">123</div>
+                <div class="gData" id="cadTar">245</div>
+                <div class="gSpace"></div>
+                <div class="gData" id="heartRate">145</div>
+            </div>
+
+            <!-- Segment Time -->
+            <div class="gTime">
+                <div class="gTimeLabel">Seg Time Remaining:</div>
+                <div class="gSpace"></div>
+                <div class="gTimeTime"><span id="segTime">0:00:00</span></div>
+            </div>
+            <!-- Workout Time -->
+            <div class="gTime">
+                <div class="gTimeLabel">Total Time Elapsed:</div>
+                <div class="gSpace"></div>
+                <div class="gTimeTime"><span id="totTime">0:00:00</span></div>
+            </div>
+
+        </div>
+
+        <div data-role="footer" data-position="fixed">
+            <h1>Footer Text</h1>
+            <a href="index.html" class="ui-btn-right">Pause</a>
+
+        </div>
     </div>
 
-    Raw Incoming Data:<br />
-    <pre id="incoming"></pre>
-    <br />
-    Workout Status Data:<br />
-    <pre id="WorkoutStatus"></pre>
-    <br />
-    User Status Data:<br />
-    <pre id="UserStatus"></pre>
-    <br />
-    Workout Def Data:<br />
-    <pre id="WorkoutDef"></pre>
+    <div data-role="page" id="pageoneA">
+        <div data-role="header">
+            <h1>WorkoutTracker</h1>
+        </div>
+
+        <div data-role="content">
+            <div id="title">SELECT WORKOUT</div>
+
+            <div id="Power" backgroud="blue">
+                <div id="powerLabel">Power Actual</div>
+                <input type="range" name="slider-fill-mini" id="power-actual" value="180" min="0" max="400" data-mini="true" data-highlight="true" data-theme="b" data-track-theme="b">
+                <div id="powerLabel">Power Target</div>
+                <input type="range" name="power-targetSlide" id="power-target" animate="true" min="0" max="400" data-mini="true" data-highlight="true" data-theme="b" data-track-theme="b">
+            </div>
+
+
+            <p><div id="Time">0:00:00</div></p>
+        </div>
+
+        <div data-role="footer" data-position="fixed">
+            <h1>Footer Text</h1>
+        </div>
+    </div>
+
+    <div data-role="page" id="pagetwo">
+        <div data-role="header">
+            <h1>User Select & Start</h1>
+        </div>
+
+        <div data-role="content">
+            <fieldset data-role="controlgroup">
+                <legend>Radio buttons, vertical controlgroup:</legend>
+                <input type="radio" name="radio-choice-1" id="radio-choice-1" value="choice-1" checked="checked">
+                <label for="radio-choice-1">Cat</label>
+                <input type="radio" name="radio-choice-1" id="radio-choice-2" value="choice-2">
+                <label for="radio-choice-2">Dog</label>
+                <input type="radio" name="radio-choice-1" id="radio-choice-3" value="choice-3">
+                <label for="radio-choice-3">Hamster</label>
+                <input type="radio" name="radio-choice-1" id="radio-choice-4" value="choice-4">
+                <label for="radio-choice-4">Lizard</label>
+            </fieldset>
+        </div>
+
+        <div data-role="footer" data-position="fixed">
+            <h1>Footer Text</h1>
+        </div>
+    </div>
+
+    <div data-role="page" id="pagethree">
+        <div data-role="header">
+            <h1>Debug</h1>
+        </div>
+
+        <div data-role="content">
+            <p><pre id="homeadd">iPhone?</pre></p>
+            <div id="raw">
+                Raw Incoming Data:<br />
+                <pre id="incoming"></pre>
+                <br />
+                Workout Status Data:<br />
+                <pre id="WorkoutStatus"></pre>
+                <br />
+                User Status Data:<br />
+                <pre id="UserStatus"></pre>
+                <br />
+                Workout Def Data:<br />
+                <pre id="WorkoutDef"></pre>
+            </div>
+            <a href="#pageone">Go to Page One</a>
+        </div>
+
+        <div data-role="footer" data-position="fixed">
+            <h1>Footer Text</h1>
+        </div>
+    </div>
+
 </body>
 </html>
