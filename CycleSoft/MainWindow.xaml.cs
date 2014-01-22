@@ -24,7 +24,7 @@ using Newtonsoft.Json;
 using System.Net;
 using System.Net.Sockets;
 //using System.Runtime.InteropServices;
-using Bend.Util;
+//using Bend.Util;
 using System.Threading;
 
 
@@ -69,7 +69,9 @@ namespace CycleSoft
         [DllImport("user32.dll")]
         public static extern IntPtr PostMessage(IntPtr hWnd, uint Msg, Int32 wParam, Int32 lParam);
         */
-        Process webProcess;
+
+// removed for internal web service
+//        Process webProcess;
 
         const uint WM_KEYDOWN = 0x100;
         const uint WM_SYSCOMMAND = 0x018;

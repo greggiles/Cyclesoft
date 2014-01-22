@@ -107,6 +107,7 @@
     <Compile Include="cWebSocketServer.cs" />
     <Compile Include="cWorkout.cs" />
     <Compile Include="hbStream.cs" />
+    <Compile Include="SimpleHttpServer.cs" />
     <Compile Include="spdStream.cs" />
     <Compile Include="powerStream.cs" />
     <Compile Include="UserPointPanel.xaml.cs">
@@ -184,10 +185,6 @@
     <ProjectReference Include="..\..\..\ClientServerExample\Fleck-master\src\Fleck\Fleck.csproj">
       <Project>{8B12D929-AFA9-4307-BEFF-2ED0F1070FEE}</Project>
       <Name>Fleck</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\SimpleWebServer\SimpleHttpServer.csproj">
-      <Project>{4fa45fb4-1b9b-4d5d-a2df-a8169e6ea43d}</Project>
-      <Name>SimpleHttpServer</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
