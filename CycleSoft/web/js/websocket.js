@@ -19,6 +19,9 @@ var start = function () {
     var totTime = document.getElementById('totTime');
 
 
+    //pagetwo
+    var userSelect = document.getElementById('userSelect');
+
 
 
     //debug page
@@ -37,7 +40,8 @@ var start = function () {
 
     var segments;
     var selectedUser = 0;
-    var segLast = -1;
+    var segLast = -1;   // segment last scan
+    var userLast = 0;   // how many users? 
 
     inc.innerHTML += "connecting to server ..<br/>";
 
@@ -90,7 +94,7 @@ var start = function () {
             powerTar.innerHTML = ~~(segments[seg].effort * jsonData.uEAs[selectedUser].ftp);
             heartRate.innerHTML = jsonData.uEAs[selectedUser].hr;
 
-            powerIndCur.style.height = ~~(jsonData.uEAs[selectedUser].instPwr / jsonData.uEAs[selectedUser].ftp * 50) + "%";
+            powerIndCur.style.height = (~~((jsonData.uEAs[selectedUser].instPwr / jsonData.uEAs[selectedUser].ftp) * 50)).toString() + "%";
 
 
             powerIndNext1.style.width = (~~(jsonData.wEA.segmentTotalMS - jsonData.wEA.segmentCurrentMS) / 500).toString() + "px";
@@ -122,13 +126,29 @@ var start = function () {
 
 
             //inc1.innerHTML = JSON.stringify(jsonData.wEA, null, "\t");
+            /*inc2.innerHTML = "users:</br>" 
+            */
 
-            /*inc2.innerHTML = "users:</br>"
-            for (var i in jsonData.uEAs) {
-				// 
-                inc2.innerHTML += JSON.stringify(jsonData.uEAs[i], null, "\t");
+            if ( userLast != jsonData.uEAs.length)
+            {
+                userLast != jsonData.uEAs.length;
+                userSelect.innerHTML = "";
+                for (var i in jsonData.uEAs) {
+                    //debug 
+                    //inc2.innerHTML += JSON.stringify(jsonData.uEAs[i], null, "\t");
+                    //
+                    //Want this for each user:
+                    //<input type="radio" name="user1" id="user1" value="1" checked="checked">
+                    //<label for="user1">Name</label>
+                    userSelect.innerHTML += "<input type=\"radio\" name=\"user"+i+"\" id=\"user"+i+"\" value=\""+i+"\"";
+                    if (i == 0) userSelect.innerHTML += "checked=\"checked\">";
+                    else userSelect.innerHTML += ">";
+                    userSelect.innerHTML += "<label for=\"user" + i + "\">" + jsonData.uEAs[i].name + "</label>";
+                }
 
             }
+
+            /*
 */
 
         };

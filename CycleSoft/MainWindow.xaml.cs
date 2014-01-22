@@ -24,7 +24,8 @@ using Newtonsoft.Json;
 using System.Net;
 using System.Net.Sockets;
 //using System.Runtime.InteropServices;
-
+using Bend.Util;
+using System.Threading;
 
 
 namespace CycleSoft
@@ -48,7 +49,7 @@ namespace CycleSoft
 
         private bool b_hasVid;
 
-        
+        private MyHttpServer webServer;
         private cWebSocketServer theServer;
         private int clientCount; 
 
@@ -110,10 +111,15 @@ namespace CycleSoft
             WorkoutHandler = new cWorkout();
 
             theServer = new cWebSocketServer();
+            webServer = new MyHttpServer(8080);
+            Thread thread = new Thread(new ThreadStart(webServer.listen));
+            thread.Start();
+
             clientCount = 0;
 
             // For IIS Express, this updates the applicationhost.config file, so that we know we run 
             // from the same directory the program is running. What a PIA
+/*
             string IISExpressFile = "C:\\Program Files\\IIS Express\\iisexpress.exe";
             if (!System.IO.File.Exists(IISExpressFile))
             {
@@ -162,7 +168,7 @@ namespace CycleSoft
                 catch
                 { MessageBox.Show("Failed to start WebProcess"); }
             }
-            
+*/            
 
             for (int i = 0; i < WorkoutHandler.workOutList.Count; i++)
             {
@@ -178,7 +184,7 @@ namespace CycleSoft
 
             dataGridUsers.DataContext = UserHandler.l_Users;
 
-            Timer _timer = new Timer(500);
+            System.Timers.Timer _timer = new System.Timers.Timer(500);
             _timer.Elapsed += new ElapsedEventHandler(_timerElapsed);
             _timer.Enabled = true;
 

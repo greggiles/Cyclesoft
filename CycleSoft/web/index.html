@@ -1,16 +1,17 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-    <link type="text/css" rel="stylesheet" href="./jquery.mobile-1.3.2.min.css" />
     <link type="text/css" rel="stylesheet" href="./stylesheet.css" />
     <script type="text/javascript" src="./js/websocket.js"></script>
-    <script type="text/javascript" src="./js/jquery.mobile-1.3.2.min.js"></script>
-    <script type="text/javascript" src="js/jquery-1.8.3.min.js"></script>
+    <link rel="stylesheet" href="./jquery.mobile-1.3.2.min.css" />
+    <script src="./js/jquery-1.8.3.min.js"></script>
+    <script src="./js/jquery.mobile-1.3.2.min.js"></script>
 
+<!--
     <link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css">
     <script src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
     <script src="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script>
-
+-->
 
     <!--iphone tags-->
     <meta name="viewport" content="initial-scale=1.0">
@@ -123,30 +124,6 @@
         </div>
     </div>
 
-    <div data-role="page" id="pageoneA">
-        <div data-role="header">
-            <h1>WorkoutTracker</h1>
-        </div>
-
-        <div data-role="content">
-            <div id="title">SELECT WORKOUT</div>
-
-            <div id="Power" backgroud="blue">
-                <div id="powerLabel">Power Actual</div>
-                <input type="range" name="slider-fill-mini" id="power-actual" value="180" min="0" max="400" data-mini="true" data-highlight="true" data-theme="b" data-track-theme="b">
-                <div id="powerLabel">Power Target</div>
-                <input type="range" name="power-targetSlide" id="power-target" animate="true" min="0" max="400" data-mini="true" data-highlight="true" data-theme="b" data-track-theme="b">
-            </div>
-
-
-            <p><div id="Time">0:00:00</div></p>
-        </div>
-
-        <div data-role="footer" data-position="fixed">
-            <h1>Footer Text</h1>
-        </div>
-    </div>
-
     <div data-role="page" id="pagetwo">
         <div data-role="header">
             <h1>User Select & Start</h1>
@@ -155,14 +132,16 @@
         <div data-role="content">
             <fieldset data-role="controlgroup">
                 <legend>Radio buttons, vertical controlgroup:</legend>
-                <input type="radio" name="radio-choice-1" id="radio-choice-1" value="choice-1" checked="checked">
-                <label for="radio-choice-1">Cat</label>
-                <input type="radio" name="radio-choice-1" id="radio-choice-2" value="choice-2">
-                <label for="radio-choice-2">Dog</label>
-                <input type="radio" name="radio-choice-1" id="radio-choice-3" value="choice-3">
-                <label for="radio-choice-3">Hamster</label>
-                <input type="radio" name="radio-choice-1" id="radio-choice-4" value="choice-4">
-                <label for="radio-choice-4">Lizard</label>
+                <span id="userSelect">
+                    <input type="radio" name="radio-choice-1" id="radio-choice-1" value="choice-1" checked="checked">
+                    <label for="radio-choice-1">Cat</label>
+                    <input type="radio" name="radio-choice-1" id="radio-choice-2" value="choice-2">
+                    <label for="radio-choice-2">Dog</label>
+                    <input type="radio" name="radio-choice-1" id="radio-choice-3" value="choice-3">
+                    <label for="radio-choice-3">Hamster</label>
+                    <input type="radio" name="radio-choice-1" id="radio-choice-4" value="choice-4">
+                    <label for="radio-choice-4">Lizard</label>
+                </span>
             </fieldset>
         </div>
 

@@ -64,6 +64,7 @@
 .gPowCur {
 	margin: 0px;
 	padding-right: 2px;
+    background-color: green;
 }
 .gPowNext {
 	margin: 0px;

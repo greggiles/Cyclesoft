@@ -185,6 +185,10 @@
       <Project>{8B12D929-AFA9-4307-BEFF-2ED0F1070FEE}</Project>
       <Name>Fleck</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\SimpleWebServer\SimpleHttpServer.csproj">
+      <Project>{4fa45fb4-1b9b-4d5d-a2df-a8169e6ea43d}</Project>
+      <Name>SimpleHttpServer</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0,Profile=Client">
@@ -210,9 +214,9 @@
     <Content Include="ANT_WrappedLib.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Resource Include="web\images\MadAnthony.png">
+    <Content Include="web\images\MadAnthony.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
+    </Content>
     <Content Include="web\images\MadAnthonySP.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
