@@ -392,18 +392,20 @@ namespace CycleSoft
                                 uEa = uw.userStatus;
                                 toSend.uEAs.Add(uEa);
                             }
-                            var json = JsonConvert.SerializeObject(toSend,
+                            var json = JsonConvert.SerializeObject(toSend);
+/*                            var json = JsonConvert.SerializeObject(toSend,
                                 new JsonSerializerSettings() { Formatting = Newtonsoft.Json.Formatting.None });
-
+*/
                             int newCount = theServer.senddata(json);
                             if(newCount != clientCount)
                             {
                                 clientCount = newCount;
                                 if (clientCount>0)
                                 {
-                                    json = JsonConvert.SerializeObject(WorkoutHandler.activeWorkout,
+                                    json = JsonConvert.SerializeObject(WorkoutHandler.activeWorkout);
+/*                                    json = JsonConvert.SerializeObject(WorkoutHandler.activeWorkout,
                                         new JsonSerializerSettings() { Formatting = Newtonsoft.Json.Formatting.None });
-
+*/
                                     theServer.senddata(json);
                                 }
                             }
@@ -602,9 +604,10 @@ namespace CycleSoft
                     }
                     drawLocalChart(cbSelectWorkout.SelectedIndex, polyline);
 
-                    var json = JsonConvert.SerializeObject(WorkoutHandler.activeWorkout,
+                    var json = JsonConvert.SerializeObject(WorkoutHandler.activeWorkout);
+/*                    var json = JsonConvert.SerializeObject(WorkoutHandler.activeWorkout,
                         new JsonSerializerSettings() { Formatting = Newtonsoft.Json.Formatting.None });
-
+*/
                     theServer.senddata(json);
                 }
             }

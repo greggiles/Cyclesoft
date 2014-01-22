@@ -26,10 +26,9 @@ namespace CycleSoft
             hbStreams = new ObservableCollection<hbStream>();
             spdStreams = new ObservableCollection<spdStream>();
 
-            BindingOperations.EnableCollectionSynchronization(pwrStreams, _pwrsyncLock);
-            BindingOperations.EnableCollectionSynchronization(hbStreams, _hbsyncLock);
-            BindingOperations.EnableCollectionSynchronization(spdStreams, _spdsyncLock);
-
+            //BindingOperations.EnableCollectionSynchronization(pwrStreams, _pwrsyncLock);
+            //BindingOperations.EnableCollectionSynchronization(hbStreams, _hbsyncLock);
+            //BindingOperations.EnableCollectionSynchronization(spdStreams, _spdsyncLock);
         }
 
         public void closeStreams()
@@ -141,7 +140,10 @@ namespace CycleSoft
                         if (id != 0)
                         {
                             powerStream ds = new powerStream(data.data);
-                            pwrStreams.Add(ds);
+                            App.Current.Dispatcher.Invoke((Action)(() =>
+                            {
+                                pwrStreams.Add(ds);
+                            }));
                             ds.timeoutEvent += new TimeoutHandler(heartBeatLost);
                         }
 
@@ -159,7 +161,10 @@ namespace CycleSoft
                         if (id != 0)
                         {
                             hbStream ds = new hbStream(data.data);
-                            hbStreams.Add(ds);
+                            App.Current.Dispatcher.Invoke((Action)(() =>
+                            {
+                                hbStreams.Add(ds);
+                            }));
                             ds.timeoutEvent += new TimeoutHandler(heartBeatLost);
                         }
                         break;
@@ -176,7 +181,10 @@ namespace CycleSoft
                         if (id != 0)
                         {
                             spdStream ds = new spdStream(data.data);
-                            spdStreams.Add(ds);
+                            App.Current.Dispatcher.Invoke((Action)(() =>
+                            {
+                                spdStreams.Add(ds);
+                            }));
                             ds.timeoutEvent += new TimeoutHandler(heartBeatLost);
                         }
                         break;

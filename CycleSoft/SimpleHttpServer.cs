@@ -65,7 +65,14 @@ namespace CycleSoft {
                 Console.WriteLine("Exception: " + e.ToString());
                 writeFailure();
             }
-            outputStream.Flush();
+            try
+            {
+                outputStream.Flush();
+            }
+            catch (Exception e) {
+                Console.WriteLine("Exception: " + e.ToString());
+                writeFailure();
+            }
             // bs.Flush(); // flush any remaining output
             inputStream = null; outputStream = null; // bs = null;            
             socket.Close();             
