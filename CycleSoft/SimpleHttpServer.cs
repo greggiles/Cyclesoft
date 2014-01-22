@@ -41,7 +41,8 @@ namespace CycleSoft {
                 next_char = inputStream.ReadByte();
                 if (next_char == '\n') { break; }
                 if (next_char == '\r') { continue; }
-                if (next_char == -1) { Thread.Sleep(1); continue; };
+                //if (next_char == -1) { Thread.Sleep(1); continue; };
+                if (next_char == -1) { break; };
                 data += Convert.ToChar(next_char);
             }            
             return data;
@@ -180,8 +181,12 @@ namespace CycleSoft {
 
         protected int port;
         TcpListener listener;
-        bool is_active = true;
-       
+        public bool is_active = true;
+
+        public void close(){
+            is_active = false;
+            listener.Stop();
+        }
         public HttpServer(int port) {
             this.port = port;
         }
@@ -189,12 +194,16 @@ namespace CycleSoft {
         public void listen() {
             listener = new TcpListener(port);
             listener.Start();
-            while (is_active) {                
-                TcpClient s = listener.AcceptTcpClient();
-                HttpProcessor processor = new HttpProcessor(s, this);
-                Thread thread = new Thread(new ThreadStart(processor.process));
-                thread.Start();
-                Thread.Sleep(1);
+            while (is_active) {
+                try
+                {
+                    TcpClient s = listener.AcceptTcpClient();
+                    HttpProcessor processor = new HttpProcessor(s, this);
+                    Thread thread = new Thread(new ThreadStart(processor.process));
+                    thread.Start();
+                    Thread.Sleep(1);
+                }
+                catch { }
             }
         }
 
@@ -211,6 +220,9 @@ namespace CycleSoft {
             Stream fs;
             StreamReader fr;
             Console.WriteLine("request: {0}", p.http_url);
+
+            if (p.http_url.Length > p.http_url.IndexOf('?') && p.http_url.IndexOf('?') > 0)
+                p.http_url = p.http_url.Substring(0, p.http_url.IndexOf('?'));
 
             if (p.http_url.Equals("/") || p.http_url.Equals("/client.html") || p.http_url.Equals("/index.html"))
             {

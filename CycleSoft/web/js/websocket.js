@@ -65,8 +65,6 @@ var start = function () {
     else
         homeadd.innerHTML = "not iPhone";
 
-
-
     // when data is comming from the server, this metod is called
     ws.onmessage = function (evt) {
         //      inc.innerHTML += evt.data + '<br/>';
@@ -84,11 +82,15 @@ var start = function () {
             segments = jsonData.segments;
         };
 
+        selectedUser = Number(getQueryVariable("id") - 1);
+        if (selectedUser < 0)
+            selectedUser = 0;
+
+
         if (jsonData.wEA) {
             userName.innerHTML = jsonData.uEAs[selectedUser].name;
             var seg = jsonData.wEA.currentSegment;
             if (seg < 0) seg = 0;
-            if (selectedUser < 0) selectedUser = 0;
 
             powerAct.innerHTML = jsonData.uEAs[selectedUser].instPwr;
             powerTar.innerHTML = ~~(segments[seg].effort * jsonData.uEAs[selectedUser].ftp);
@@ -132,18 +134,10 @@ var start = function () {
             if ( userLast != jsonData.uEAs.length)
             {
                 userLast != jsonData.uEAs.length;
-                userSelect.innerHTML = "";
+                userSelect.innerHTML = "<option value=\"0\">Select</option>";
                 for (var i in jsonData.uEAs) {
-                    //debug 
-                    //inc2.innerHTML += JSON.stringify(jsonData.uEAs[i], null, "\t");
-                    //
-                    //Want this for each user:
-                    //<input type="radio" name="user1" id="user1" value="1" checked="checked">
-                    //<label for="user1">Name</label>
-                    userSelect.innerHTML += "<input type=\"radio\" name=\"user"+i+"\" id=\"user"+i+"\" value=\""+i+"\"";
-                    if (i == 0) userSelect.innerHTML += "checked=\"checked\">";
-                    else userSelect.innerHTML += ">";
-                    userSelect.innerHTML += "<label for=\"user" + i + "\">" + jsonData.uEAs[i].name + "</label>";
+                    //<option value="standard">Standard: 7 day</option>
+                    userSelect.innerHTML += "<option value=\"" + (Number(i) + 1) + "\">" + jsonData.uEAs[i].name + "</option>";
                 }
 
             }
@@ -183,4 +177,14 @@ function pad(n) {
     return (n < 10) ? ("0" + n) : n;
 }
 
+
+function getQueryVariable(variable) {
+    var query = window.location.search.substring(1);
+    var vars = query.split("&");
+    for (var i = 0; i < vars.length; i++) {
+        var pair = vars[i].split("=");
+        if (pair[0] == variable) { return pair[1]; }
+    }
+    return (false);
+}
 window.onload = start;

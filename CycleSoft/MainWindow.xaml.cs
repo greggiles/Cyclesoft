@@ -50,6 +50,8 @@ namespace CycleSoft
         private bool b_hasVid;
 
         private MyHttpServer webServer;
+        private Thread webThread;
+        private ThreadStart webListen;
         private cWebSocketServer theServer;
         private int clientCount; 
 
@@ -90,7 +92,18 @@ namespace CycleSoft
                 PostMessage(editHandle, WM_KEYDOWN, 'Q', 0);
             }
             */
+            webServer.close();
+            AntHandler.shutdown();
+            AntHandler.channelMessageHandler -= StreamHandler.handleAntData;
+            StreamHandler.closeStreams();
+
+            
+            Application.Current.ShutdownMode = ShutdownMode.OnMainWindowClose;
+
             Application.Current.Shutdown();
+            //ok, this isn't pretty, but ...
+            //webThread.Abort();
+
         }
         public MainWindow()
         {
@@ -114,8 +127,10 @@ namespace CycleSoft
 
             theServer = new cWebSocketServer();
             webServer = new MyHttpServer(8080);
-            Thread thread = new Thread(new ThreadStart(webServer.listen));
-            thread.Start();
+            webListen = new ThreadStart(webServer.listen);
+            webThread = new Thread(webListen);
+            webThread.Start();
+
 
             clientCount = 0;
 
