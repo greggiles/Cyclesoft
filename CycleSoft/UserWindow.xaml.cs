@@ -50,7 +50,7 @@ namespace CycleSoft
         
         public void updateWorkoutEvent(object sender, workoutEventArgs e)
         {
-            this.Dispatcher.Invoke((Action)(() => {
+            this.Dispatcher.BeginInvoke((Action)(() => {
                 try
                 {
                     workoutStreamToClose = (cWorkout)sender;
@@ -96,7 +96,7 @@ namespace CycleSoft
         public void updateEvent(object sender, userEventArgs e)
         {
             userStatus = e;
-            this.Dispatcher.Invoke((Action)(() => {
+            this.Dispatcher.BeginInvoke((Action)(() => {
 
                 userStreamToClose = (cAntUsers)sender;
              

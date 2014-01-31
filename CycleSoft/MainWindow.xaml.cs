@@ -48,6 +48,7 @@ namespace CycleSoft
         public cDrawingEngine drawingEngine;
 
         private bool b_hasVid;
+        private bool b_vidPlaying;
 
         private MyHttpServer webServer;
         private Thread webThread;
@@ -110,6 +111,7 @@ namespace CycleSoft
 
             //totally cheating, and making this hard coded for now
             b_hasVid = false;
+            b_vidPlaying = false;
             // video file is linked from xaml file, anyways.
 
             drawingEngine = new cDrawingEngine();
@@ -317,7 +319,20 @@ namespace CycleSoft
         void _timerElapsed(object sender, ElapsedEventArgs e)
         {
 
-            this.Dispatcher.Invoke((Action)(() =>
+            // moved out of Invoke? 2014-01-29
+            if (WorkoutHandler.bIsFinished)
+            {
+                bStartWorkout.IsEnabled = false;
+                bStartWorkout2.IsEnabled = false;
+                bEndWorkout.IsEnabled = false;
+                bEndWorkout2.IsEnabled = false;
+                bStartWorkout.Content = "Select Workout";
+                bStartWorkout2.Content = "Select Workout";
+                bEndWorkout.Content = "End Workout";
+                bEndWorkout2.Content = "End Workout";
+            }
+
+            this.Dispatcher.BeginInvoke((Action)(() =>
             {
 
                 try
@@ -326,116 +341,112 @@ namespace CycleSoft
                     dataGridHR.Items.Refresh();
                     dataGridSpdCad.Items.Refresh();
                     dataGridUsers.Items.Refresh();
-
-                    if (WorkoutHandler.bIsFinished)
-                    {
-                        bStartWorkout.IsEnabled = false;
-                        bStartWorkout2.IsEnabled = false;
-                        bEndWorkout.IsEnabled = false;
-                        bEndWorkout2.IsEnabled = false;
-                        bStartWorkout.Content = "Select Workout";
-                        bStartWorkout2.Content = "Select Workout";
-                        bEndWorkout.Content = "End Workout";
-                        bEndWorkout2.Content = "End Workout";
-                    }
-                    try
-                    {
-                        string webresponse;
-                        if (userWindows.Count > 0)
-                        {
-                            textBoxTotalTime.Text = userWindows[0].textBoxTotalTime.Text;
-                            textBoxSegmentTime.Text = userWindows[0].textBoxSegmentTime.Text;
-
-                            webresponse = userWindows[0].textBoxTotalTime.Text;
-                            webresponse += "<br>" + userWindows[0].textBoxSegmentTime.Text;
-                        }
-                        else
-                        {
-                            textBoxTotalTime.Text = "??";
-                            textBoxSegmentTime.Text = "??";
-
-                            webresponse = "No Users Loaded<br>No Workout?<br>";
-
-                        }
-
-                        switch (userWindows.Count)
-                        {
-                            case 0:
-                                clrUserPointPanel(userPointPanel4);
-                                clrUserPointPanel(userPointPanel3);
-                                clrUserPointPanel(userPointPanel2);
-                                clrUserPointPanel(userPointPanel1);
-                                break;
-                            case 1:
-                                clrUserPointPanel(userPointPanel4);
-                                clrUserPointPanel(userPointPanel3);
-                                clrUserPointPanel(userPointPanel2);
-                                updateUserPointPanel(userPointPanel1, 0);
-                                break;
-                            case 2:
-                                clrUserPointPanel(userPointPanel4);
-                                clrUserPointPanel(userPointPanel3);
-                                updateUserPointPanel(userPointPanel2, 1);
-                                updateUserPointPanel(userPointPanel1, 0);
-                                break;
-                            case 3:
-                                clrUserPointPanel(userPointPanel4);
-                                updateUserPointPanel(userPointPanel3, 2);
-                                updateUserPointPanel(userPointPanel2, 1);
-                                updateUserPointPanel(userPointPanel1, 0);
-                                break;
-                            default:
-                                updateUserPointPanel(userPointPanel4, 3);
-                                updateUserPointPanel(userPointPanel3, 2);
-                                updateUserPointPanel(userPointPanel2, 1);
-                                updateUserPointPanel(userPointPanel1, 0);
-                                break;
-                        }
-                        //theServer.senddata(webresponse);
-
-                        JsonData toSend = new JsonData();
-                        toSend.uEAs = new List<userEventArgs>();
-                        
-                        if (userWindows.Count > 0 || WorkoutHandler.bIsRunning)
-                        {
-                            foreach (UserWindow uw in userWindows)
-                            {
-                                //workoutEventArgs wEa = new workoutEventArgs();
-                                //wEa = uw.workoutStatus;
-                                toSend.wEA = uw.workoutStatus;
-                                userEventArgs uEa = new userEventArgs();
-                                uEa = uw.userStatus;
-                                toSend.uEAs.Add(uEa);
-                            }
-                            var json = JsonConvert.SerializeObject(toSend);
-/*                            var json = JsonConvert.SerializeObject(toSend,
-                                new JsonSerializerSettings() { Formatting = Newtonsoft.Json.Formatting.None });
-*/
-                            int newCount = theServer.senddata(json);
-                            if(newCount != clientCount)
-                            {
-                                clientCount = newCount;
-                                if (clientCount>0)
-                                {
-                                    json = JsonConvert.SerializeObject(WorkoutHandler.activeWorkout);
-/*                                    json = JsonConvert.SerializeObject(WorkoutHandler.activeWorkout,
-                                        new JsonSerializerSettings() { Formatting = Newtonsoft.Json.Formatting.None });
-*/
-                                    theServer.senddata(json);
-                                }
-                            }
-                        }
-
-
-
-                    
-                    }
-                    catch { }
-
                 }
                 catch
-                { }
+                {}
+
+                try
+                {
+                    if (userWindows.Count > 0)
+                    {
+                        textBoxTotalTime.Text = userWindows[0].textBoxTotalTime.Text;
+                        textBoxSegmentTime.Text = userWindows[0].textBoxSegmentTime.Text;
+
+                    }
+                    else
+                    {
+                        textBoxTotalTime.Text = "??";
+                        textBoxSegmentTime.Text = "??";
+                    }
+                }
+                catch 
+                {}
+
+                try
+                {
+                    switch (userWindows.Count)
+                    {
+                        case 0:
+                            clrUserPointPanel(userPointPanel4);
+                            clrUserPointPanel(userPointPanel3);
+                            clrUserPointPanel(userPointPanel2);
+                            clrUserPointPanel(userPointPanel1);
+                            break;
+                        case 1:
+                            clrUserPointPanel(userPointPanel4);
+                            clrUserPointPanel(userPointPanel3);
+                            clrUserPointPanel(userPointPanel2);
+                            updateUserPointPanel(userPointPanel1, 0);
+                            break;
+                        case 2:
+                            clrUserPointPanel(userPointPanel4);
+                            clrUserPointPanel(userPointPanel3);
+                            updateUserPointPanel(userPointPanel2, 1);
+                            updateUserPointPanel(userPointPanel1, 0);
+                            break;
+                        case 3:
+                            clrUserPointPanel(userPointPanel4);
+                            updateUserPointPanel(userPointPanel3, 2);
+                            updateUserPointPanel(userPointPanel2, 1);
+                            updateUserPointPanel(userPointPanel1, 0);
+                            break;
+                        default:
+                            updateUserPointPanel(userPointPanel4, 3);
+                            updateUserPointPanel(userPointPanel3, 2);
+                            updateUserPointPanel(userPointPanel2, 1);
+                            updateUserPointPanel(userPointPanel1, 0);
+                            break;
+                    }
+                }                 
+                catch
+                {}
+
+
             }));
+
+
+            try
+            {
+                //theServer.senddata(webresponse);
+
+                JsonData toSend = new JsonData();
+                toSend.uEAs = new List<userEventArgs>();
+
+                if (userWindows.Count > 0 || WorkoutHandler.bIsRunning)
+                {
+                    foreach (UserWindow uw in userWindows)
+                    {
+                        //workoutEventArgs wEa = new workoutEventArgs();
+                        //wEa = uw.workoutStatus;
+                        toSend.wEA = uw.workoutStatus;
+                        userEventArgs uEa = new userEventArgs();
+                        uEa = uw.userStatus;
+                        toSend.uEAs.Add(uEa);
+                    }
+                    var json = JsonConvert.SerializeObject(toSend);
+                    /*                            var json = JsonConvert.SerializeObject(toSend,
+                                                    new JsonSerializerSettings() { Formatting = Newtonsoft.Json.Formatting.None });
+                    */
+                    int newCount = theServer.senddata(json);
+                    if (newCount != clientCount)
+                    {
+                        clientCount = newCount;
+                        if (clientCount > 0)
+                        {
+                            json = JsonConvert.SerializeObject(WorkoutHandler.activeWorkout);
+                            /*                                    json = JsonConvert.SerializeObject(WorkoutHandler.activeWorkout,
+                                                                    new JsonSerializerSettings() { Formatting = Newtonsoft.Json.Formatting.None });
+                            */
+                            theServer.senddata(json);
+                        }
+                    }
+                }
+
+            }
+            catch { }
+        
+        
+        
         }
 
 
@@ -531,8 +542,11 @@ namespace CycleSoft
                     bStartWorkout2.Content = "Re-Start Workout";
                     bEndWorkout.IsEnabled = true;
                     bEndWorkout2.IsEnabled = true;
-                    if(b_hasVid)
+                    if (b_hasVid)
+                    {
+                        b_vidPlaying = false;
                         mediaElement1.Pause();
+                    }
                 }
             }
             else if (bStartWorkout.Content.Equals("Re-Start Workout"))
@@ -544,7 +558,10 @@ namespace CycleSoft
                     bEndWorkout.IsEnabled = false;
                     bEndWorkout2.IsEnabled = false;
                     if (b_hasVid)
+                    {
                         mediaElement1.Play();
+                        b_vidPlaying = true;
+                    }
                 }
             }
 
@@ -668,16 +685,18 @@ namespace CycleSoft
         {
             if (b_hasVid)
             {
-                if (e.running)
+                if (e.running && !b_vidPlaying)
                 {
+                    b_vidPlaying = true;
                     this.Dispatcher.Invoke((Action)(() =>
                     {
                         mediaElement1.Play();
                        
                     }));
                 }
-                else
+                else if (!e.running && b_vidPlaying)
                 {
+                    b_vidPlaying = false;
                     this.Dispatcher.Invoke((Action)(() =>
                     {
                         mediaElement1.Pause();

@@ -298,7 +298,7 @@ namespace CycleSoft
                     workoutEventStartStop(this, wSA);
                 }
                 bIsRunning = true;
-                _updateTimer = new Timer(100);
+                _updateTimer = new Timer(500);
                 _updateTimer.Elapsed += new ElapsedEventHandler(_updateTimerElapsed);
                 _updateTimer.Enabled = true;
 

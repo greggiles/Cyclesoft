@@ -26,9 +26,9 @@ namespace CycleSoft
             hbStreams = new ObservableCollection<hbStream>();
             spdStreams = new ObservableCollection<spdStream>();
 
-            //BindingOperations.EnableCollectionSynchronization(pwrStreams, _pwrsyncLock);
-            //BindingOperations.EnableCollectionSynchronization(hbStreams, _hbsyncLock);
-            //BindingOperations.EnableCollectionSynchronization(spdStreams, _spdsyncLock);
+            BindingOperations.EnableCollectionSynchronization(pwrStreams, _pwrsyncLock);
+            BindingOperations.EnableCollectionSynchronization(hbStreams, _hbsyncLock);
+            BindingOperations.EnableCollectionSynchronization(spdStreams, _spdsyncLock);
         }
 
         public void closeStreams()
@@ -88,7 +88,7 @@ namespace CycleSoft
                     }
                     powerStream ds = new powerStream(sAddress, (byte)sensorTypes.Power, uId);
                     pwrStreams.Add(ds);
-                    //ds.timeoutEvent += new TimeoutHandler(heartBeatLost);
+                    ds.timeoutEvent += new TimeoutHandler(heartBeatLost);
                     return pwrStreams.Count - 1;
 
                 case (byte)sensorTypes.HeartRate:
@@ -98,7 +98,7 @@ namespace CycleSoft
                     }
                     hbStream hbds = new hbStream(sAddress, (byte)sensorTypes.HeartRate, uId);
                     hbStreams.Add(hbds);
-                    //ds.timeoutEvent += new TimeoutHandler(heartBeatLost);
+                    hbds.timeoutEvent += new TimeoutHandler(heartBeatLost);
                     return hbStreams.Count - 1;
 
                 case (byte)sensorTypes.SpeedCadence:
@@ -108,7 +108,7 @@ namespace CycleSoft
                     }
                     spdStream spdds = new spdStream(sAddress, (byte)sensorTypes.SpeedCadence, uId);
                     spdStreams.Add(spdds);
-                    //ds.timeoutEvent += new TimeoutHandler(heartBeatLost);
+                    spdds.timeoutEvent += new TimeoutHandler(heartBeatLost);
                     return spdStreams.Count - 1;
 
                 default:
@@ -140,10 +140,10 @@ namespace CycleSoft
                         if (id != 0)
                         {
                             powerStream ds = new powerStream(data.data);
-                            App.Current.Dispatcher.Invoke((Action)(() =>
-                            {
+                            //App.Current.Dispatcher.Invoke((Action)(() =>
+                            //{
                                 pwrStreams.Add(ds);
-                            }));
+                            //}));
                             ds.timeoutEvent += new TimeoutHandler(heartBeatLost);
                         }
 
@@ -161,10 +161,10 @@ namespace CycleSoft
                         if (id != 0)
                         {
                             hbStream ds = new hbStream(data.data);
-                            App.Current.Dispatcher.Invoke((Action)(() =>
-                            {
+                            //App.Current.Dispatcher.Invoke((Action)(() =>
+                            //{
                                 hbStreams.Add(ds);
-                            }));
+                            //}));
                             ds.timeoutEvent += new TimeoutHandler(heartBeatLost);
                         }
                         break;
@@ -181,10 +181,10 @@ namespace CycleSoft
                         if (id != 0)
                         {
                             spdStream ds = new spdStream(data.data);
-                            App.Current.Dispatcher.Invoke((Action)(() =>
-                            {
+                            //App.Current.Dispatcher.Invoke((Action)(() =>
+                            //{
                                 spdStreams.Add(ds);
-                            }));
+                            //}));
                             ds.timeoutEvent += new TimeoutHandler(heartBeatLost);
                         }
                         break;

@@ -65,7 +65,10 @@ namespace CycleSoft
 
         private void openLog(ushort sensorAddress)
         {
-            String Filename = sensorAddress.ToString() + "_SpdCad_log.txt";
+            string logPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "CycleSoft\\SensorLogFiles\\");
+            Directory.CreateDirectory(logPath);
+
+            String Filename = logPath + sensorAddress.ToString() + "_SpdCad_log.txt";
             log = new StreamWriter(Filename.ToString());
             log.WriteLine(DateTime.Now.ToString("HH:mm:ss") + ": log opened for new stream.");
             log.Write("    Stream Speed and Cadence data for sensor " + sensorAddress.ToString());
