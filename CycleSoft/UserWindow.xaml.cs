@@ -85,6 +85,9 @@ namespace CycleSoft
                         bWorkoutRunning = false;
                         textBlockWorkout.Text = "PAUSED";
                     }
+
+                    if (textBlockWorkout.Text == "")
+                        textBlockWorkout.Text = activeWorkout.segments[workoutStatus.currentSegment].segmentName;
                 }
                 catch { };
             }));
@@ -311,6 +314,8 @@ namespace CycleSoft
                             userStreamToClose.points += 1;
                             cadMeterCanvas.Background = new SolidColorBrush(Colors.LightGreen);
                         }
+                        else
+                            cadMeterCanvas.Background = new SolidColorBrush(Colors.Black);
                     }
                     else if (activeWorkout.segments[workoutStatus.currentSegment].cadTarget - cadInst <= 
                         activeWorkout.segments[workoutStatus.currentSegment].ptsCadMinus)

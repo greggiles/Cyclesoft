@@ -4,6 +4,9 @@ var start = function () {
     var userName = document.getElementById('userName');
     var powerAct = document.getElementById('powerAct');
     var powerTar = document.getElementById('powerTar');
+    var powerLast = document.getElementById('powerLast');
+    var cadAct = document.getElementById('cadAct');
+    var cadTar = document.getElementById('cadTar');
     var heartRate = document.getElementById('heartRate');
     var powerIndCur = document.getElementById('powerIndCur');
     var powerIndNext1 = document.getElementById('powerIndNext1');
@@ -75,10 +78,6 @@ var start = function () {
         if (jsonData.title) {
             //pageone
             workoutName.innerHTML = jsonData.title + " - ";
-
-            //debug page
-            //inc3.innerHTML = "Fucking Workout is " + jsonData.title + "</br>" + JSON.stringify(jsonData, null, "\t");
-
             segments = jsonData.segments;
         };
 
@@ -93,7 +92,11 @@ var start = function () {
             if (seg < 0) seg = 0;
 
             powerAct.innerHTML = jsonData.uEAs[selectedUser].instPwr;
-            powerTar.innerHTML = ~~(segments[seg].effort * jsonData.uEAs[selectedUser].ftp);
+            powerTar.innerHTML = (segments[seg].effort * jsonData.uEAs[selectedUser].ftp).toFixed(0);
+            powerLast.innerHTML = jsonData.uEAs[selectedUser].lastAvgPwr;
+
+            cadAct.innerHTML = jsonData.uEAs[selectedUser].cad;
+            cadTar.innerHTML = segments[seg].cadTarget;
             heartRate.innerHTML = jsonData.uEAs[selectedUser].hr;
 
             powerIndCur.style.height = (~~((jsonData.uEAs[selectedUser].instPwr / jsonData.uEAs[selectedUser].ftp) * 50)).toString() + "%";

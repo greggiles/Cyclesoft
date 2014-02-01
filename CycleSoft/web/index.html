@@ -35,7 +35,9 @@
 
     $(document).on("pageinit", "#pagetwo", function () {
         $("div").on("swiperight", function () {
-            window.location.href = "./";
+            //change to back, so that page 2 can inclue point totals
+            window.history.back();
+            //window.location.href = "./";
         });
         $("div").on("swipeleft", function () {
             window.location.href = "./#pagethree";

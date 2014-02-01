@@ -274,7 +274,7 @@ namespace CycleSoft
 
             upp.textBox_HRUser1.Text = userWindows[userWin].userStreamToClose.hr.ToString();
             upp.textBox_PwrUser1.Text = userWindows[userWin].userStreamToClose.instPower.ToString();
-            upp.textBox_PointsUser1.Text = userWindows[userWin].userStreamToClose.points.ToString();
+            upp.textBox_PointsUser1.Text = Math.Truncate(userWindows[userWin].userStreamToClose.points).ToString();
             upp.textBox_CADUser1.Text = userWindows[userWin].userStreamToClose.cad.ToString();
 
             Thickness currentMargin = upp.polylineCanvas.Margin;

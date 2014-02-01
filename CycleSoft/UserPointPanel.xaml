@@ -10,12 +10,12 @@
             <RowDefinition Height="61*" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="6*" />
-            <ColumnDefinition Width="5*" />
-            <ColumnDefinition Width="5*" />
-            <ColumnDefinition Width="5*" />
+            <ColumnDefinition Width="95" />
+            <ColumnDefinition />
+            <ColumnDefinition />
+            <ColumnDefinition />
         </Grid.ColumnDefinitions>
-        <Canvas Background="Black" Name="polylineCanvasOuter" Margin="0,115,3,0" Grid.RowSpan="2" Canvas.Left="238" Grid.ColumnSpan="4" ClipToBounds="True">
+        <Canvas Background="Black" Name="polylineCanvasOuter" Margin="0,115,3,0.2" Grid.RowSpan="2" Canvas.Left="238" Grid.ColumnSpan="4" ClipToBounds="True">
             <Canvas Background="Black" Name="polylineCanvas" Margin="0,0,0,0" Width="500" Height="{Binding ActualHeight, ElementName=polylineCanvasOuter}">
                 <Path Stroke="#000000FF" StrokeThickness="0.5" Fill="SteelBlue">
                     <Path.Data>
@@ -46,10 +46,10 @@
                 </Path>
             </Canvas>
         </Canvas>
-        <TextBlock Height="23" Margin="2,48,3,0" Name="textBlock1" Text="Heartrate" TextAlignment="Center" VerticalAlignment="Top" Grid.Column="3" />
-        <TextBlock Height="23" Margin="2,48,0,0" Name="textBlock2" Text="Cadence" TextAlignment="Center" VerticalAlignment="Top" Grid.Column="2" />
-        <TextBox FontSize="35" FontStretch="ExtraCondensed" Height="53" HorizontalContentAlignment="Center" Margin="0,62,0,0" Name="textBox_HRUser1" Text="167" TextAlignment="Center" VerticalAlignment="Top" VerticalContentAlignment="Center" Grid.Column="3" />
-        <Canvas Background="Black" Height="24" Margin="2,4,3,0" Name="powerMeterCanvas" VerticalAlignment="Top" Grid.ColumnSpan="3" Grid.Column="1">
+        <TextBlock Height="23" Margin="2.4,48,3,0" Name="textBlock1" Text="Heartrate" TextAlignment="Center" VerticalAlignment="Top" Grid.Column="3" />
+        <TextBlock Height="23" Margin="2.2,48,3.6,0" Name="textBlock2" Text="Cadence" TextAlignment="Center" VerticalAlignment="Top" Grid.Column="2" />
+        <TextBox FontSize="35" FontStretch="ExtraCondensed" Height="53" HorizontalContentAlignment="Center" Margin="0.4,62,0,0" Name="textBox_HRUser1" Text="167" TextAlignment="Center" VerticalAlignment="Top" VerticalContentAlignment="Center" Grid.Column="3" />
+        <Canvas Background="Black" Height="24" Margin="3.6,4,3,0" Name="powerMeterCanvas" VerticalAlignment="Top" Grid.ColumnSpan="3" Grid.Column="1">
             <Path Stroke="#000000FF" StrokeThickness="0.5">
                 <Path.Fill>
                     <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
@@ -75,7 +75,7 @@
                 </Path.Data>
             </Path>
         </Canvas>
-        <Canvas Background="Black" Height="24" Margin="2,28,3,0" Name="cadMeterCanvas" VerticalAlignment="Top" Grid.ColumnSpan="3" Grid.Column="1">
+        <Canvas Background="Black" Height="24" Margin="3.6,28,3,0" Name="cadMeterCanvas" VerticalAlignment="Top" Grid.ColumnSpan="3" Grid.Column="1">
             <Path Stroke="#000000FF" StrokeThickness="0.5">
                 <Path.Fill>
                     <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
@@ -101,12 +101,12 @@
                 </Path.Data>
             </Path>
         </Canvas>
-        <TextBox FontSize="35" FontStretch="ExtraCondensed" Height="53" HorizontalContentAlignment="Center" Margin="0,62,0,0" Name="textBox_CADUser1" Text="167" TextAlignment="Center" VerticalAlignment="Top" VerticalContentAlignment="Center" Grid.Column="2" />
-        <TextBox FontSize="35" FontStretch="ExtraCondensed" Height="53" HorizontalContentAlignment="Center" Margin="0,62,3,0" Name="textBox_PointsUser1" Text="9999" TextAlignment="Center" VerticalAlignment="Top" VerticalContentAlignment="Center" />
-        <TextBox FontSize="16" FontStretch="Condensed" Height="25" HorizontalContentAlignment="Center" Margin="0,3,3,0" Name="textBox_FirstUser1" Text="Greg" TextAlignment="Center" VerticalAlignment="Top" VerticalContentAlignment="Center" />
-        <TextBox FontSize="16" FontStretch="Condensed" Height="25" HorizontalContentAlignment="Center" Margin="0,26,3,0" Name="textBox_LastUser1" Text="Greg Last" TextAlignment="Center" VerticalAlignment="Top" VerticalContentAlignment="Center" />
-        <TextBlock Height="23" Margin="0,48,3,0" Name="textBlock3" Text="Points" TextAlignment="Center" VerticalAlignment="Top" />
-        <TextBox FontSize="35" FontStretch="ExtraCondensed" Height="53" HorizontalContentAlignment="Center" Margin="0,62,0,0" Name="textBox_PwrUser1" Text="167" TextAlignment="Center" VerticalAlignment="Top" VerticalContentAlignment="Center" Grid.Column="1" />
-        <TextBlock Margin="2,49,0,0" Name="textBlock4" Text="Power" TextAlignment="Center" Height="23" VerticalAlignment="Top" Grid.Column="1" />
+        <TextBox FontSize="35" FontStretch="ExtraCondensed" Height="53" HorizontalContentAlignment="Center" Margin="0.2,62,3.6,0" Name="textBox_CADUser1" Text="167" TextAlignment="Center" VerticalAlignment="Top" VerticalContentAlignment="Center" Grid.Column="2" />
+        <TextBox FontSize="30" FontStretch="ExtraCondensed" Height="53" HorizontalContentAlignment="Center" Margin="0,62,6.4,0" Name="textBox_PointsUser1" Text="19999.5" TextAlignment="Center" VerticalAlignment="Top" VerticalContentAlignment="Center" />
+        <TextBox FontSize="16" FontStretch="Condensed" Height="25" HorizontalContentAlignment="Center" Margin="0,3,6.4,0" Name="textBox_FirstUser1" Text="Greg" TextAlignment="Center" VerticalAlignment="Top" VerticalContentAlignment="Center" />
+        <TextBox FontSize="16" FontStretch="Condensed" Height="25" HorizontalContentAlignment="Center" Margin="0,26,6.4,0" Name="textBox_LastUser1" Text="Greg Last" TextAlignment="Center" VerticalAlignment="Top" VerticalContentAlignment="Center" />
+        <TextBlock Height="23" Margin="0,48,6.4,0" Name="textBlock3" Text="Points" TextAlignment="Center" VerticalAlignment="Top" />
+        <TextBox FontSize="35" FontStretch="ExtraCondensed" Height="53" HorizontalContentAlignment="Center" Margin="2.6,62,2.8,0" Name="textBox_PwrUser1" Text="167" TextAlignment="Center" VerticalAlignment="Top" VerticalContentAlignment="Center" Grid.Column="1" />
+        <TextBlock Margin="2.6,48,2.8,0" Name="textBlock4" Text="Power" TextAlignment="Center" Height="23" VerticalAlignment="Top" Grid.Column="1" />
     </Grid>
 </UserControl>
