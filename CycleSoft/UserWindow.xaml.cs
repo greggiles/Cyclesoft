@@ -30,6 +30,7 @@ namespace CycleSoft
         private int hb;
         private int powerInst;
         private double powerMax;
+        private double ftpx2;
 
         private workoutDef activeWorkout;
 
@@ -38,7 +39,6 @@ namespace CycleSoft
         public workoutEventArgs workoutStatus {  get; protected set; }
         public userEventArgs userStatus {  get; protected set; }
 
-
         private bool bWorkoutRunning;
 
         // The activeWorkout points ... to quickly draw the target
@@ -46,70 +46,44 @@ namespace CycleSoft
         // time ... average the y from each of these points.
         Point[] currentWorkoutPoints;
 
+        List<Point> spdData;
+        List<Point> hrData;
+        List<Point> cadData;
+        List<Point> pwrData;
+        List<Point> avgpwrData;
+
+        public PointCollection pTarget;
+
+
         cDrawingEngine dwgEngine;
         
         public void updateWorkoutEvent(object sender, workoutEventArgs e)
         {
-            this.Dispatcher.BeginInvoke((Action)(() => {
-                try
-                {
-                    workoutStreamToClose = (cWorkout)sender;
-                    workoutStatus = e;
+            workoutStreamToClose = (cWorkout)sender;
+            workoutStatus = e;
 
-                    if (workoutStatus.running) bWorkoutRunning = true;
-
-                    textBlockWorkout.Text = e.message;
-
-                    if (workoutStatus.starting || activeWorkout != workoutStreamToClose.activeWorkout)
-                    {
-                        load_Workout(workoutStreamToClose.activeWorkout);
-                        userStreamToClose.points = 0;
-                    }
-
-                    if (workoutStatus.finished)
-                    {
-                        bWorkoutRunning = false;
-                        textBlockWorkout.Text = "FINISHED";
-                    }
-
-                    //TimeSpan duration = new TimeSpan(0, 0, 0, (int)((workoutStatus.workoutTotalMS - workoutStatus.workoutCurrentMS) / 1000));
-                    // Show time going up for total Workout Time
-                    TimeSpan duration = new TimeSpan(0, 0, 0, (int)((workoutStatus.workoutCurrentMS) / 1000));
-                    textBoxTotalTime.Text = duration.ToString(@"h\:mm\:ss");
-
-                    duration = new TimeSpan(0, 0, 0, (int)((999 + workoutStatus.segmentTotalMS - workoutStatus.segmentCurrentMS) / 1000));
-                    textBoxSegmentTime.Text = duration.ToString(@"h\:mm\:ss");
-
-                    if (workoutStatus.paused && !workoutStatus.finished)
-                    {
-                        bWorkoutRunning = false;
-                        textBlockWorkout.Text = "PAUSED";
-                    }
-
-                    if (textBlockWorkout.Text == "")
-                        textBlockWorkout.Text = activeWorkout.segments[workoutStatus.currentSegment].segmentName;
-                }
-                catch { };
-            }));
-
-
+            if (workoutStatus.running) bWorkoutRunning = true;
         }
 
 
         public void updateEvent(object sender, userEventArgs e)
         {
             userStatus = e;
-            this.Dispatcher.BeginInvoke((Action)(() => {
 
-                userStreamToClose = (cAntUsers)sender;
-             
+            hb = e.hr;
+            spdInst = e.speed;
+            cadInst = e.cad;
+            ftpx2 = e.ftp * 2;
+            powerMax = (e.ftp + (dwgEngine.chartZoom * e.ftp / 2));
+
+            userStreamToClose = (cAntUsers)sender;
+
+            this.Dispatcher.BeginInvoke((Action)(() =>
+            {             
                 textBoxHr.Text = e.hr.ToString();
-                hb = e.hr;
 
                 textBoxMPH.Text = e.speed.ToString("F1");
                 textBoxCad.Text = e.cad.ToString();
-                spdInst = e.speed;
-                cadInst = e.cad;
 
                 textBoxPwr.Text = e.instPwr.ToString();
                 powerInst = e.instPwr;
@@ -117,228 +91,279 @@ namespace CycleSoft
                 textPwrAvgLast.Text = e.lastAvgPwr.ToString();
 
                 textBoxPoints.Text = e.points.ToString();
-
                 try
                 {
                     labelPwr50.Content = e.ftp.ToString();
-                    powerMax = (e.ftp + (dwgEngine.chartZoom * e.ftp / 2));
                     labelPwrMax.Content = ((int)(powerMax)).ToString();
                     labelPwr75.Content = ((int)(3 * powerMax / 4)).ToString();
                     labelPwr25.Content = ((int)(powerMax / 4)).ToString();
                 }
                 catch { }
+            }));
 
 
-                // Draw Instant Power Bar
-                var points = new Point[4];
-                double x = (double)e.instPwr / powerMax;
-                if (x > 1)  x = 1;
+            // Draw Instant Power Bar
+            var xpoints = new Point[4];
+            double xx = (double)e.instPwr / ftpx2;
+            if (xx > 1)  xx = 1;
 
-                points[0] = new Point(0.0, 0.02);
-                points[1] = new Point(0.0, 0.98);
-                points[2] = new Point(x, 0.98);
-                points[3] = new Point(x, 0.02);
+            xpoints[0] = new Point(0.0, 0.02);
+            xpoints[1] = new Point(0.0, 0.98);
+            xpoints[2] = new Point(xx, 0.98);
+            xpoints[3] = new Point(xx, 0.02);
 
-                var figure = new PathFigure
+
+            //Draw Avg Power Bar
+            // Changing this to CAD bar on 1/6/2014
+            // x = (double)e.avgPwr / powerMax;
+            double x = (double)cadInst / 150;
+            if (x > 1) x = 1;
+            var pointsCad = new Point[4];
+            pointsCad[0] = new Point(0.0, 0.02);
+            pointsCad[1] = new Point(0.0, 0.98);
+            pointsCad[2] = new Point(x, 0.98);
+            pointsCad[3] = new Point(x, 0.02);
+
+
+            //work on target Power Line
+
+            double y = 0;
+            double ymin = 0;
+            double ymax = 1;
+
+            double target = 0;
+
+            int cadColor = 0;
+            int pwrColor = 0;
+
+
+            if (bWorkoutRunning)
+            {
+                target = activeWorkout.segments[workoutStatus.currentSegment].effort;
+                if (workoutStatus.alternateTarget > 0) target = workoutStatus.alternateTarget;
+                y = target / 2;
+                ymin = y - activeWorkout.segments[workoutStatus.currentSegment].ptsMinus / 2;
+                if (ymin < 0) ymin = 0;
+                ymax = y + activeWorkout.segments[workoutStatus.currentSegment].ptsPlus / 2;
+                if (ymax > 1) ymax = 1;
+
+                // send more Points to User. Note THIS REALLY DOESN"T BELONG HERE? :(
+                if (e.instPwr >= target * e.ftp && e.instPwr <= (target+activeWorkout.segments[workoutStatus.currentSegment].ptsPlus)*e.ftp )
                 {
-                    StartPoint = points[0],
-                    IsClosed = true
-                };
-
-                var segment = new PolyLineSegment(points.Skip(1), true);
-                figure.Segments.Add(segment);
-                polylinePwr.Figures.Clear();
-                polylinePwr.Figures.Add(figure);
-
-                //Draw Avg Power Bar
-                // Changing this to CAD bar on 1/6/2014
-                // x = (double)e.avgPwr / powerMax;
-                x = (double)cadInst / 150;
-                if (x > 1) x = 1;
-                points[0] = new Point(0.0, 0.02);
-                points[1] = new Point(0.0, 0.98);
-                points[2] = new Point(x, 0.98);
-                points[3] = new Point(x, 0.02);
-
-                figure = new PathFigure
-                {
-                    StartPoint = points[0],
-                    IsClosed = true
-                };
-
-                segment = new PolyLineSegment(points.Skip(1), true);
-                figure.Segments.Add(segment);
-                polylineAvgPwr.Figures.Clear();
-                polylineAvgPwr.Figures.Add(figure);
-
-                //work on target Power Line
-
-                double y = 0;
-                double ymin = 0;
-                double ymax = 1;
-
-                double target = 0;
-
-                if (bWorkoutRunning)
-                {
-                    target = activeWorkout.segments[workoutStatus.currentSegment].effort;
-                    if (workoutStatus.alternateTarget > 0) target = workoutStatus.alternateTarget;
-                    y = target / 2;
-                    ymin = y - activeWorkout.segments[workoutStatus.currentSegment].ptsMinus / 2;
-                    if (ymin < 0) ymin = 0;
-                    ymax = y + activeWorkout.segments[workoutStatus.currentSegment].ptsPlus / 2;
-                    if (ymax > 1) ymax = 1;
-                }
-                else
-                {
-                    y = 1 - (double)e.ftp / powerMax;
-                }
-
-                points = new Point[10];
-                points[0] = new Point(y, 0.05);
-                points[1] = new Point(y, 0.4);
-                points[2] = new Point(ymin, 0.5);
-                points[3] = new Point(y, 0.6);
-                points[4] = new Point(y, .95);
-                points[5] = new Point(y+.01, .95);
-                points[6] = new Point(y+.01, 0.6);
-                points[7] = new Point(ymax, 0.5);
-                points[8] = new Point(y + .01, 0.4);
-                points[9] = new Point(y + .01, .05);
-
-
-                figure = new PathFigure
-                {
-                    StartPoint = points[0],
-                    IsClosed = true
-                };
-
-                segment = new PolyLineSegment(points.Skip(1), true);
-                figure.Segments.Add(segment);
-                polylinePwrTarget.Figures.Clear();
-                polylinePwrTarget.Figures.Add(figure);
-
-                //work on target Cad Line
-
-                y = 0;
-                if (bWorkoutRunning)
-                {
-                    y = (double)activeWorkout.segments[workoutStatus.currentSegment].cadTarget / 150;
-                    ymin = y - (double)activeWorkout.segments[workoutStatus.currentSegment].ptsCadMinus / 150;
-                    if (ymin < 0) ymin = 0;
-                    ymax = y + (double)activeWorkout.segments[workoutStatus.currentSegment].ptsCadPlus / 150;
-                    if (ymax > 1) ymax = 1;
-                }
-                else
-                {
-                    y = .5;
-                    ymin = 0;
-                    ymax = 1;
-                }
-
-                points[0] = new Point(y, 0.05);
-                points[1] = new Point(y, 0.4);
-                points[2] = new Point(ymin, 0.5);
-                points[3] = new Point(y, 0.6);
-                points[4] = new Point(y, .95);
-                points[5] = new Point(y + .01, .95);
-                points[6] = new Point(y + .01, 0.6);
-                points[7] = new Point(ymax, 0.5);
-                points[8] = new Point(y + .01, 0.4);
-                points[9] = new Point(y + .01, .05);
-
-
-                figure = new PathFigure
-                {
-                    StartPoint = points[0],
-                    IsClosed = true
-                };
-
-                segment = new PolyLineSegment(points.Skip(1), true);
-                figure.Segments.Add(segment);
-                polylineCadTarget.Figures.Clear();
-                polylineCadTarget.Figures.Add(figure);
-                
-                // 
-                //ReDraw HR, Cadence, Speed and Power Lines                
-                //
-
-                if (bWorkoutRunning && !workoutStatus.paused)
-                {
-
-                    x = (double)workoutStatus.workoutCurrentMS / workoutStatus.workoutTotalMS;
-                    y = spdInst / 40;
-                    if (y > 1) y = 1;
-                    Point spd = new Point(x, 1 - y);
-                    spdData.Add(spd);
-                    extend_line(spdline, (spdData));
-
-                    y = ((double)hb / 200);
-                    if (y > 1) y = 1;
-                    Point hr = new Point(x, 1 - y);
-                    hrData.Add(hr);
-                    extend_line(hrline, hrData);
-
-                    y = ((double)cadInst / 200);
-                    if (y > 1) y = 1;
-                    Point cad = new Point(x, 1 - y);
-                    cadData.Add(cad);
-                    extend_line(cadline, cadData);
-                    
-                    y = (double)powerInst / (powerMax);
-                    if (y > 1) y = 1;
-                    Point pwr = new Point(x, 1 - y);
-                    pwrData.Add(pwr);
-                    extend_line(pwrline, dwgEngine.scaleLine(pwrData));
-
-                    // send more Points to User. Note THIS REALLY DOESN"T BELONG HERE? :(
-                    double powerdiff = 2 * (y - target / 2);
-                    if (powerdiff < 0 && -powerdiff <= activeWorkout.segments[workoutStatus.currentSegment].ptsMinus)
-                    {
-                        userStreamToClose.points += .5;
-                        powerMeterCanvas.Background = new SolidColorBrush(Colors.Yellow);
-                    }
-                    else if (powerdiff > 0 && powerdiff <= activeWorkout.segments[workoutStatus.currentSegment].ptsPlus)
-                    {
+                    if (!workoutStatus.paused)
                         userStreamToClose.points += 1;
-                        powerMeterCanvas.Background = new SolidColorBrush(Colors.LightGreen);
-                    }
-                    else
-                        powerMeterCanvas.Background = new SolidColorBrush(Colors.Black);
-
-                    if (cadInst >= activeWorkout.segments[workoutStatus.currentSegment].cadTarget)
-                    {
-                        if (cadInst - activeWorkout.segments[workoutStatus.currentSegment].cadTarget <= 
-                            activeWorkout.segments[workoutStatus.currentSegment].ptsCadPlus)
-                        {
-                            userStreamToClose.points += 1;
-                            cadMeterCanvas.Background = new SolidColorBrush(Colors.LightGreen);
-                        }
-                        else
-                            cadMeterCanvas.Background = new SolidColorBrush(Colors.Black);
-                    }
-                    else if (activeWorkout.segments[workoutStatus.currentSegment].cadTarget - cadInst <= 
-                        activeWorkout.segments[workoutStatus.currentSegment].ptsCadMinus)
-                    {
+                    pwrColor = 1;
+                }
+                else if (e.instPwr < target * e.ftp && e.instPwr >= (target-activeWorkout.segments[workoutStatus.currentSegment].ptsMinus)*e.ftp )
+                {
+                    if (!workoutStatus.paused)                       
                         userStreamToClose.points += .5;
-                        cadMeterCanvas.Background = new SolidColorBrush(Colors.Yellow);
+                    pwrColor = 2;
+                }
+            }
+            else
+            {
+                y = 1 - (double)e.ftp / ftpx2;
+            }
+
+            var pointsPT = new Point[10];
+            pointsPT[0] = new Point(y, 0.05);
+            pointsPT[1] = new Point(y, 0.4);
+            pointsPT[2] = new Point(ymin, 0.5);
+            pointsPT[3] = new Point(y, 0.6);
+            pointsPT[4] = new Point(y, .95);
+            pointsPT[5] = new Point(y + .01, .95);
+            pointsPT[6] = new Point(y + .01, 0.6);
+            pointsPT[7] = new Point(ymax, 0.5);
+            pointsPT[8] = new Point(y + .01, 0.4);
+            pointsPT[9] = new Point(y + .01, .05);
+
+
+            //work on target Cad Line
+
+            y = 0;
+            if (bWorkoutRunning)
+            {
+                y = (double)activeWorkout.segments[workoutStatus.currentSegment].cadTarget / 150;
+                ymin = y - (double)activeWorkout.segments[workoutStatus.currentSegment].ptsCadMinus / 150;
+                if (ymin < 0) ymin = 0;
+                ymax = y + (double)activeWorkout.segments[workoutStatus.currentSegment].ptsCadPlus / 150;
+                if (ymax > 1) ymax = 1;
+
+                if (cadInst >= activeWorkout.segments[workoutStatus.currentSegment].cadTarget)
+                {
+                    if (cadInst - activeWorkout.segments[workoutStatus.currentSegment].cadTarget <=
+                        activeWorkout.segments[workoutStatus.currentSegment].ptsCadPlus)
+                    {
+                        if (!workoutStatus.paused)
+                            userStreamToClose.points += 1;
+                        cadColor = 1;
                     }
-                    else
-                        cadMeterCanvas.Background = new SolidColorBrush(Colors.Black);
+                }
+                else if (activeWorkout.segments[workoutStatus.currentSegment].cadTarget - cadInst <=
+                    activeWorkout.segments[workoutStatus.currentSegment].ptsCadMinus)
+                {
+                    if (!workoutStatus.paused)
+                        userStreamToClose.points += .5;
+                    cadColor = 2;
+                }
+            }
+            else
+            {
+                y = .5;
+                ymin = 0;
+                ymax = 1;
+            }
 
 
+            var pointsCT = new Point[10];
+            pointsCT[0] = new Point(y, 0.05);
+            pointsCT[1] = new Point(y, 0.4);
+            pointsCT[2] = new Point(ymin, 0.5);
+            pointsCT[3] = new Point(y, 0.6);
+            pointsCT[4] = new Point(y, .95);
+            pointsCT[5] = new Point(y + .01, .95);
+            pointsCT[6] = new Point(y + .01, 0.6);
+            pointsCT[7] = new Point(ymax, 0.5);
+            pointsCT[8] = new Point(y + .01, 0.4);
+            pointsCT[9] = new Point(y + .01, .05);
+
+
+            // 
+            //ReDraw HR, Cadence, Speed and Power Lines                
+            //
+
+            if (bWorkoutRunning && !workoutStatus.paused)
+            {
+
+                x = (double)workoutStatus.workoutCurrentMS / workoutStatus.workoutTotalMS;
+                y = spdInst / 40;
+                if (y > 1) y = 1;
+                Point spd = new Point(x, 1 - y);
+                spdData.Add(spd);
+
+                y = ((double)hb / 200);
+                if (y > 1) y = 1;
+                Point hr = new Point(x, 1 - y);
+                hrData.Add(hr);
+
+                y = ((double)cadInst / 200);
+                if (y > 1) y = 1;
+                Point cad = new Point(x, 1 - y);
+                cadData.Add(cad);
+
+                y = (double)powerInst / (powerMax);
+                if (y > 1) y = 1;
+                Point pwr = new Point(x, 1 - y);
+                pwrData.Add(pwr);
+            }
+
+            //TimeSpan duration = new TimeSpan(0, 0, 0, (int)((workoutStatus.workoutTotalMS - workoutStatus.workoutCurrentMS) / 1000));
+            // Show time going up for total Workout Time
+            TimeSpan duration = new TimeSpan(0, 0, 0, (int)((workoutStatus.workoutCurrentMS) / 1000));
+            TimeSpan durationSeg = new TimeSpan(0, 0, 0, (int)((999 + workoutStatus.segmentTotalMS - workoutStatus.segmentCurrentMS) / 1000));
+
+            this.Dispatcher.BeginInvoke((Action)(() =>
+            {
+                textBlockWorkout.Text = workoutStatus.message;
+                if (workoutStreamToClose != null)
+                {
+                    if (workoutStatus.starting || activeWorkout != workoutStreamToClose.activeWorkout)
+                    {
+                        load_Workout(workoutStreamToClose.activeWorkout);
+                        userStreamToClose.points = 0;
+                    }
                 }
 
-          }));
+                if (workoutStatus.finished)
+                {
+                    bWorkoutRunning = false;
+                    textBlockWorkout.Text = "FINISHED";
+                }
+
+                textBoxTotalTime.Text = duration.ToString(@"h\:mm\:ss");
+                textBoxSegmentTime.Text = durationSeg.ToString(@"h\:mm\:ss");
+
+                if (workoutStatus.paused && !workoutStatus.finished)
+                {
+                    bWorkoutRunning = false;
+                    textBlockWorkout.Text = "PAUSED";
+                }
+
+                if (textBlockWorkout.Text == "" && activeWorkout != null)
+                    textBlockWorkout.Text = activeWorkout.segments[workoutStatus.currentSegment].segmentName;
+
+
+                if (roundRobin == 0) extend_line(spdline, (spdData));
+                if (roundRobin == 1) extend_line(hrline, hrData);
+                if (roundRobin == 2) extend_line(cadline, cadData);
+                if (roundRobin == 3) extend_line(pwrline, dwgEngine.scaleLine(pwrData));
+                
+                if(++roundRobin > 3) roundRobin = 0;
+                
+
+                if (pwrColor == 1) powerMeterCanvas.Background = new SolidColorBrush(Colors.LightGreen);
+                else if (pwrColor == 2) powerMeterCanvas.Background = new SolidColorBrush(Colors.Yellow);
+                else powerMeterCanvas.Background = new SolidColorBrush(Colors.Black);
+
+                if (cadColor == 1) cadMeterCanvas.Background = new SolidColorBrush(Colors.LightGreen);
+                else if (cadColor == 2) cadMeterCanvas.Background = new SolidColorBrush(Colors.Yellow);
+                else cadMeterCanvas.Background = new SolidColorBrush(Colors.Black);
+
+                PathFigure figureInstPower = new PathFigure
+                {
+                    StartPoint = xpoints[0],
+                    IsClosed = true
+                };
+
+                var segment = new PolyLineSegment(xpoints.Skip(1), true);
+                figureInstPower.Segments.Add(segment);
+                polylinePwr.Figures.Clear();
+                polylinePwr.Figures.Add(figureInstPower);
+
+                PathFigure figureAvgPower = new PathFigure
+                {
+                    StartPoint = pointsCad[0],
+                    IsClosed = true
+                };
+
+
+                segment = new PolyLineSegment(pointsCad.Skip(1), true);
+                figureAvgPower.Segments.Add(segment);
+                polylineAvgPwr.Figures.Clear();
+                polylineAvgPwr.Figures.Add(figureAvgPower);
+
+                PathFigure figurePowerMeter = new PathFigure
+                {
+                    StartPoint = pointsPT[0],
+                    IsClosed = true
+                };
+
+                segment = new PolyLineSegment(pointsPT.Skip(1), true);
+                figurePowerMeter.Segments.Add(segment);
+                polylinePwrTarget.Figures.Clear();
+                polylinePwrTarget.Figures.Add(figurePowerMeter);
+
+                PathFigure figureCadMeter = new PathFigure
+                {
+                    StartPoint = pointsCT[0],
+                    IsClosed = true
+                };
+
+                segment = new PolyLineSegment(pointsCT.Skip(1), true);
+                figureCadMeter.Segments.Add(segment);
+                polylineCadTarget.Figures.Clear();
+                polylineCadTarget.Figures.Add(figureCadMeter);
+            }));
+
+
+            
+
                     
         }
 
-        List<Point> spdData;
-        List<Point> hrData;
-        List<Point> cadData;
-        List<Point> pwrData;
-        List<Point> avgpwrData;
 
+        private int roundRobin;
         public UserWindow()
         {
             InitializeComponent();
@@ -352,7 +377,20 @@ namespace CycleSoft
             pwrData = new List<Point>();
             avgpwrData = new List<Point>();
 
-            workoutStatus = new workoutEventArgs();
+            pTarget = new PointCollection(10);
+            Point pt01 = new Point(.01, .01);
+            Point pt02 = new Point(.06, .01);
+            Point pt03 = new Point(.07, .06);
+            Point pt04 = new Point(.04, .06);
+            pTarget.Add(pt01);
+            pTarget.Add(pt02);
+            pTarget.Add(pt03);
+            pTarget.Add(pt04);
+
+
+              workoutStatus = new workoutEventArgs();
+
+            roundRobin = 0;
 
             powerMax = 400;
             labelPwrMax.Content = "400";
@@ -455,15 +493,15 @@ namespace CycleSoft
 
         private void extend_line(PathGeometry line, List<Point> points)
         {
-            if (points.Count < 2) return;
+            if (points.Count < 5) return;
             var figure = new PathFigure
             {
-                StartPoint = points[points.Count-2],
+                StartPoint = points[points.Count-5],
                 IsClosed = false
             };
 
-            var segment = new LineSegment();
-            segment.Point = points[points.Count - 1];
+            var segment = new PolyLineSegment(points.Skip(points.Count-5), true);
+
             figure.Segments.Add(segment);
             //line.Clear();
             line.Figures.Add(figure);

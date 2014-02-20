@@ -674,6 +674,21 @@ namespace CycleSoft
             if (cbSelectWorkout.SelectedIndex >= 0)
                 drawLocalChart(cbSelectWorkout.SelectedIndex, polyline);
 
+            try
+            {
+                userPointPanel1.pwrline.Clear();
+                userPointPanel2.pwrline.Clear();
+                userPointPanel3.pwrline.Clear();
+                userPointPanel4.pwrline.Clear();
+
+                userPointPanel1.spdline.Clear();
+                userPointPanel2.spdline.Clear();
+                userPointPanel3.spdline.Clear();
+                userPointPanel4.spdline.Clear();
+            }
+            catch { }
+
+
             if (userWindows != null)
             {
                 foreach (UserWindow uw in userWindows)

@@ -114,6 +114,7 @@ namespace CycleSoft
                     
                     float temp = cadCnt/((float)cadTime/(60*TIMEDIVISOR));
                     cadInst = (int)temp;
+                    if (cadInst > 200 || cadInst < 0) cadInst = lastCad;
                     prevCadTime = BitConverter.ToUInt16(inputData, pCADTIME);
                     prevCadCnt = BitConverter.ToUInt16(inputData, pCADCNT);
                     preCadUpdCnt = 0;
@@ -143,7 +144,8 @@ namespace CycleSoft
 
 
                     spdInst = (rph * wheelSize / 1609344);
-                    
+                    if (spdInst > 50 || spdInst < 0) spdInst = lastSpd;
+
                     prevSpdTime = BitConverter.ToUInt16(inputData, pSPDTIME);
                     prevSpdCnt = BitConverter.ToUInt16(inputData, pSPDCNT);
                     preSpdUpdCnt = 0;

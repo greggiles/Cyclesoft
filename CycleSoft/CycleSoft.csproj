@@ -9,7 +9,7 @@
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CycleSoft</RootNamespace>
-    <AssemblyName>CycleSoft</AssemblyName>
+    <AssemblyName>tAlleyCat</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
@@ -29,10 +29,10 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <ProductName>WorkoutTracker</ProductName>
+    <ProductName>tAlleyCat</ProductName>
     <PublisherName>CycleSoft</PublisherName>
     <SuiteName>CycleSoft</SuiteName>
-    <ApplicationRevision>18</ApplicationRevision>
+    <ApplicationRevision>20</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -103,6 +103,7 @@
     <Compile Include="cDrawingEngine.cs" />
     <Compile Include="cSpowerCalcs.cs" />
     <Compile Include="cStreamHandler.cs" />
+    <Compile Include="cTCXFileGenerator.cs" />
     <Compile Include="cUserHandler.cs" />
     <Compile Include="cWebSocketServer.cs" />
     <Compile Include="cWorkout.cs" />

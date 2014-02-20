@@ -35,33 +35,6 @@ namespace CycleSoft
         public DateTime time;
     }
 
-    public class TCXdata
-    {
-        // Stores Trackpoint Data, like:
-        /*  
-          <Trackpoint>
-            <Time>2013-11-20T02:32:47Z</Time>
-            <DistanceMeters>9859.3</DistanceMeters>
-            <HeartRateBpm>
-              <Value>140</Value>
-            </HeartRateBpm>
-            <Cadence>87</Cadence>
-            <Extensions>
-              <ns3:TPX>
-                <ns3:Watts>175</ns3:Watts>
-                <ns3:Speed>6.88138888888889</ns3:Speed>
-              </ns3:TPX>
-            </Extensions>
-          </Trackpoint>
-        */
-        public DateTime timeStamp;
-        public double distanceMeters;
-        public int heartRate;
-        public int cadence;
-        public int power;
-        public double speed;
-
-    }
 
     public class cAntUsers
     {
@@ -73,6 +46,9 @@ namespace CycleSoft
         public int avgPower { get; protected set; }
         public int avgPowerTime { get; set; }
         private Queue<powerPoints> qPWRQue;
+
+        private Queue<powerPoints> qPWRSmoothQue;
+
         private Queue<double> qSPDQue;
 
         public double speed { get; protected set; }
@@ -95,8 +71,9 @@ namespace CycleSoft
 
         public event EventHandler<userEventArgs> userUpdateHandler;
 
-        private Queue<TCXdata> tcxData;
+        //private Queue<TCXdata> tcxData;
 
+        private cTCXFileGenerator TCXFileHandler;
         private Timer _TCXDataTimer;
 
         public cAntUsers()
@@ -124,11 +101,12 @@ namespace CycleSoft
             _TCXDataTimer = new Timer(1000);
             _TCXDataTimer.Elapsed += new ElapsedEventHandler(_addTCXTimer);
 
-            
+
             qPWRQue = new Queue<powerPoints>();
+            qPWRSmoothQue = new Queue<powerPoints>();
             qSPDQue = new Queue<double>();
 
-            tcxData = new Queue<TCXdata>();
+            //tcxData = new Queue<TCXdata>();
 
 
         }
@@ -138,10 +116,23 @@ namespace CycleSoft
 
         public void updateWorkoutEvent(object sender, workoutEventArgs e)
         {
+            
             if (e.running && !e.paused && _TCXDataTimer.Enabled == false)
             {
                 segAvgPower = new int[200];
-                clrTCXData();
+                string title = "none";
+                try
+                {
+                    cWorkout workout = (cWorkout)sender;
+                    title = workout.activeWorkout.title;
+                }
+                catch
+                { title = "idk"; }
+                if (TCXFileHandler == null)
+                {
+                    TCXFileHandler = new cTCXFileGenerator(firstName, lastName, title);
+                    TCXDistanceCount = 0;
+                }
                 _TCXDataTimer.Enabled = true;
             }
             else if (e.paused && _TCXDataTimer.Enabled)
@@ -149,7 +140,9 @@ namespace CycleSoft
             else if (e.finished && (_TCXDataTimer.Enabled || e.paused))
             {
                 _TCXDataTimer.Enabled = false;
-                writeTCXData(e.workoutCurrentMS/1000);
+                //writeTCXData(e.workoutCurrentMS/1000);
+                TCXFileHandler.closeTCXData();
+                TCXFileHandler = null;
             }
 
             if (e.running && !e.paused)
@@ -170,94 +163,18 @@ namespace CycleSoft
         }
 
         private long TCXDistanceCount;
-        public void clrTCXData()
-        {
-            tcxData.Clear();
-            TCXDistanceCount = 0;
-        }
         public void _addTCXTimer(object sender, ElapsedEventArgs e)
         {
-            addTCXData();
+            //addTCXData();
+            TCXdata TrackPoint = new TCXdata();
+            TrackPoint.timeStamp = DateTime.Now;
+            TrackPoint.distanceMeters = (double)wheelSize * (double)TCXDistanceCount / 1000;
+            TrackPoint.heartRate = hr;
+            TrackPoint.cadence = cad;
+            TrackPoint.power = instPower;
+            TrackPoint.speed = speed * 0.44704; //convert to meters/sec.
+            TCXFileHandler.addTCXData(TrackPoint);
         }
-        // Add data to a queue to be written to TCX export File
-        // ...
-        public void addTCXData()
-        {   //        public DateTime timeStamp;
-            //        public double distanceMeters;
-            //        public int heartRate;
-            //        public int cadence;
-            //        public int power;
-            //        public double speed;
-            TCXdata newTrackPoint = new TCXdata();
-            newTrackPoint.timeStamp = DateTime.Now;
-            newTrackPoint.distanceMeters = (double)wheelSize * (double)TCXDistanceCount / 1000;
-            newTrackPoint.heartRate = hr;
-            newTrackPoint.cadence = cad;
-            newTrackPoint.power = instPower;
-            newTrackPoint.speed = speed * 0.44704; //convert to meters/sec.
-
-            tcxData.Enqueue(newTrackPoint);
-        }
-
-        public void writeTCXData(long seconds)
-        {   //        public DateTime timeStamp;
-
-            TCXdata point;
-            try {
-                point = tcxData.Peek();
-            }
-            catch
-            {
-                MessageBox.Show("Failed to peek at tcx Data");
-                return;
-            }
-            string userPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "CycleSoft\\TCXFiles\\");
-            Directory.CreateDirectory(userPath);
-            Stream tcxOutContents = File.Open(userPath + firstName + "_" + lastName + "_" + point.timeStamp.ToString("yyyyddhh") + ".tcx", FileMode.CreateNew);
-            StreamWriter tcxStreamWrite = new StreamWriter(tcxOutContents);
-            tcxStreamWrite.WriteLine("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
-            tcxStreamWrite.WriteLine("<TrainingCenterDatabase xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xsi:schemaLocation=\"http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2 http://www.garmin.com/xmlschemas/TrainingCenterDatabasev2.xsd\" xmlns:ns5=\"http://www.garmin.com/xmlschemas/ActivityGoals/v1\" xmlns:ns3=\"http://www.garmin.com/xmlschemas/ActivityExtension/v2\" xmlns:ns2=\"http://www.garmin.com/xmlschemas/UserProfile/v2\" xmlns=\"http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:ns4=\"http://www.garmin.com/xmlschemas/ProfileExtension/v1\">");
-            tcxStreamWrite.WriteLine("\t<Activities xmlns=\"http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2\">");
-            tcxStreamWrite.WriteLine("\t\t<Activity Sport=\"Biking\">");
-            tcxStreamWrite.WriteLine("\t\t\t<Id>" + point.timeStamp.ToUniversalTime().ToString("s") + "Z</Id>");
-            tcxStreamWrite.WriteLine("\t\t\t<Lap StartTime=\""+point.timeStamp.ToUniversalTime().ToString("s")+"Z\">");
-            tcxStreamWrite.WriteLine("\t\t\t\t<TotalTimeSeconds>"+seconds+"</TotalTimeSeconds>");
-            tcxStreamWrite.WriteLine("\t\t\t\t<DistanceMeters>" + wheelSize * TCXDistanceCount / 1000 + "</DistanceMeters>");
-            tcxStreamWrite.WriteLine("\t\t\t\t<Calories>10</Calories>");
-            tcxStreamWrite.WriteLine("\t\t\t\t<Intensity>Active</Intensity>");
-            tcxStreamWrite.WriteLine("\t\t\t\t<TriggerMethod>Time</TriggerMethod>");
-            tcxStreamWrite.WriteLine("\t\t\t\t<Track>");
-
-            while (tcxData.Count > 0)
-            {
-                point = tcxData.Dequeue();
-                tcxStreamWrite.WriteLine("\t\t\t\t\t<Trackpoint>");
-                tcxStreamWrite.WriteLine("\t\t\t\t\t\t<Time>" + point.timeStamp.ToUniversalTime().ToString("s") + "Z</Time>");
-                tcxStreamWrite.WriteLine("\t\t\t\t\t\t<DistanceMeters>"+point.distanceMeters+"</DistanceMeters>");
-                tcxStreamWrite.WriteLine("\t\t\t\t\t\t<HeartRateBpm>");
-                tcxStreamWrite.WriteLine("\t\t\t\t\t\t\t<Value>"+point.heartRate+"</Value>");
-                tcxStreamWrite.WriteLine("\t\t\t\t\t\t</HeartRateBpm>");
-                tcxStreamWrite.WriteLine("\t\t\t\t\t\t<Cadence>"+point.cadence+"</Cadence>");
-                tcxStreamWrite.WriteLine("\t\t\t\t\t\t<Extensions>");
-                tcxStreamWrite.WriteLine("\t\t\t\t\t\t\t<ns3:TPX>");
-                tcxStreamWrite.WriteLine("\t\t\t\t\t\t\t\t<ns3:Watts>"+point.power+"</ns3:Watts>");
-                tcxStreamWrite.WriteLine("\t\t\t\t\t\t\t\t<ns3:Speed>"+point.speed+"</ns3:Speed>");
-                tcxStreamWrite.WriteLine("\t\t\t\t\t\t\t</ns3:TPX>");
-                tcxStreamWrite.WriteLine("\t\t\t\t\t\t</Extensions>");
-                tcxStreamWrite.WriteLine("\t\t\t\t\t</Trackpoint>");
-            }
-
-            tcxStreamWrite.WriteLine("\t\t\t\t</Track>");
-            tcxStreamWrite.WriteLine("\t\t\t</Lap>");
-            tcxStreamWrite.WriteLine("\t\t</Activity>");
-            tcxStreamWrite.WriteLine("\t</Activities>");
-            tcxStreamWrite.WriteLine("</TrainingCenterDatabase>");
-
-            tcxStreamWrite.Close();
-            tcxOutContents.Close();
-        }
-
-
 
         // This data is to update user Window ... should probably get WorkOut Messages in this class. 
         // Should really be doing work here. :(
@@ -299,22 +216,26 @@ namespace CycleSoft
                 return;
             }
 
-            instPower = evtFrom.powerInst;
+            powerPoints pp = new powerPoints();
+            pp.instPwr = evtFrom.powerInst;
+            pp.time = DateTime.Now;
+
+            if (avgPowerTime > 0)
+            {
+                qPWRSmoothQue.Enqueue(pp);
+                while (qPWRSmoothQue.Peek().time < DateTime.Now.Subtract(TimeSpan.FromSeconds((double)avgPowerTime)))
+                    qPWRSmoothQue.Dequeue();
+            }
+
+            if (qPWRQue.Count > 0 && avgPowerTime > 0)
+                instPower = (int)qPWRSmoothQue.Average(s => s.instPwr);
+            else
+                instPower = evtFrom.powerInst;
 
             if (_TCXDataTimer.Enabled)
             {
 
-                powerPoints pp = new powerPoints();
-                pp.instPwr = evtFrom.powerInst;
-                pp.time = DateTime.Now;
                 qPWRQue.Enqueue(pp);
-
-                /*
-                 * This was using time filtering, going to try doing this with segment averages
-                 * 
-                           while (qPWRQue.Peek().time < DateTime.Now.Subtract(TimeSpan.FromSeconds((double)avgPowerTime)))
-                               qPWRQue.Dequeue();
-               */
                 avgPower = 0;
                 if (qPWRQue.Count > 0)
                     avgPower = (int)qPWRQue.Average(s => s.instPwr);
