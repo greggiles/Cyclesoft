@@ -196,6 +196,8 @@ namespace CycleSoft
             }
 
             WorkoutHandler.workoutEventStartStop += updateWorkoutEvent;
+            theServer.remoteEventStartStop += remotePlayPauseEvent;
+            
 
             dataGridPower.DataContext = StreamHandler.pwrStreams;
             dataGridHR.DataContext = StreamHandler.hbStreams;
@@ -519,8 +521,22 @@ namespace CycleSoft
 
         }
 
+        public void remotePlayPauseEvent(object sender, EventArgs e)
+        {
+            this.Dispatcher.BeginInvoke((Action)(() =>
+            {
+                playPause();
+            }
+            ));
+        }
+
         
         private void bStartWorkout_Click(object sender, RoutedEventArgs e)
+        {
+            playPause();
+        }
+
+        private void playPause()
         {
 
             if (bStartWorkout.Content.Equals("Start Workout"))
@@ -566,7 +582,6 @@ namespace CycleSoft
             }
 
         }
-
 
         private void bEndWorkout_Click(object sender, RoutedEventArgs e)
         {

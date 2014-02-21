@@ -9,11 +9,15 @@ using Fleck;
 
 namespace CycleSoft
 {
+    public delegate void remoteEventStartStop(object sender, EventArgs e);
+
     class cWebSocketServer
     {
         private WebSocketServer server;
         private List<IWebSocketConnection> allSockets;
         public int clientCount { get; private set; }
+        public event EventHandler<EventArgs> remoteEventStartStop;
+
         public cWebSocketServer()
         {   
             FleckLog.Level = LogLevel.Debug;
@@ -35,6 +39,12 @@ namespace CycleSoft
                         };
                     socket.OnMessage = message =>
                         {
+                            if (null != remoteEventStartStop)
+                            {
+                                EventArgs e = new EventArgs();
+                                remoteEventStartStop(this, e);
+                            }
+                            
                          /*   var assembly = Assembly.GetExecutingAssembly();
                             var resourceName = "CycleSoft.client.html";
                             string[] result = assembly.GetManifestResourceNames();

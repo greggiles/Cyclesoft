@@ -45,7 +45,7 @@ var start = function () {
 	var powerBarTarget = document.getElementById('powerBarTarget');
 	var powerBarRange = document.getElementById('powerBarRange');
 	var powerBarTargetNext = document.getElementById('powerBarTargetNext');
-	var powerBarPointDisplay = document.getElementById('powerBarPoints');
+	var powerBarPoints = document.getElementById('powerBarPoints');
 
 	var cadBarContainer = document.getElementById('cadBarContainer');
 	var cadBar = document.getElementById('cadBar');
@@ -59,8 +59,10 @@ var start = function () {
 
     var time = document.getElementById('Time');
     var wsImpl = window.WebSocket || window.MozWebSocket;
+
     var form = document.getElementById('sendForm');
-    var input = document.getElementById('sendText');
+
+    var pauseBtn = document.getElementById('pauseBtn');
 
     var segments;
     var selectedUser = 0;
@@ -90,204 +92,177 @@ var start = function () {
         homeadd.innerHTML = "not iPhone";
 
     // when data is comming from the server, this metod is called
-    ws.onmessage = function (evt) {
-        //      inc.innerHTML += evt.data + '<br/>';
-        //  inc.innerHTML = evt.data + '<br/>';
-
-        var jsonData = JSON.parse(evt.data);
-
-        if (jsonData.title) {
-            //pageone
-            workoutName.innerHTML = jsonData.title;
-            segments = jsonData.segments;
-        };
-
-        selectedUser = Number(getQueryVariable("id") - 1);
-        if (selectedUser < 0)
-            selectedUser = 0;
-
-
-        if (jsonData.wEA) {
-            userName.innerHTML = jsonData.uEAs[selectedUser].name;
-            var seg = jsonData.wEA.currentSegment;
-            if (seg < 0) seg = 0;
-
-            var currentEffort = segments[seg].effort; 
-            if (jsonData.wEA.alternateTarget > 0)
-                currentEffort = jsonData.wEA.alternateTarget;
-
-            segmentName.innerHTML = segments[seg].segmentName;
-
-            powerAct.innerHTML = jsonData.uEAs[selectedUser].instPwr;
-
-            powerTar.innerHTML = (currentEffort * jsonData.uEAs[selectedUser].ftp).toFixed(0);
-            powerAct.style.backgroundColor = "white";
-			powerBarContainer.style.backgroundColor = "white";
-            if (jsonData.uEAs[selectedUser].instPwr >= ((currentEffort + segments[seg].ptsPlus) * jsonData.uEAs[selectedUser].ftp))
-            {
-				powerAct.style.backgroundColor = "white";
-				powerBarContainer.style.backgroundColor = "white";
-            }
-			else if (jsonData.uEAs[selectedUser].instPwr >= (currentEffort * jsonData.uEAs[selectedUser].ftp))
-            {
-				powerAct.style.backgroundColor = "lime";
-				powerBarContainer.style.backgroundColor = "lime";
-            }
-			else if (jsonData.uEAs[selectedUser].instPwr >= ((currentEffort - segments[seg].ptsMinus) * jsonData.uEAs[selectedUser].ftp))
-            {
-				powerAct.style.backgroundColor = "yellow";
-				powerBarContainer.style.backgroundColor = "yellow";
-			}
-
-            powerLast.innerHTML = jsonData.uEAs[selectedUser].lastAvgPwr;
-
-			powerBar.style.width = (~~((jsonData.uEAs[selectedUser].instPwr / jsonData.uEAs[selectedUser].ftp) * 50)).toString() + "%";
-			powerBarTarget.style.left = (currentEffort * 50).toString() + "%";
-			powerBarRange.style.left = ((currentEffort - segments[seg].ptsMinus) * 50).toString() + "%";
-			powerBarRange.style.width = ((segments[seg].ptsPlus + segments[seg].ptsMinus) * 50).toString() + "%";
-            if ((jsonData.wEA.segmentTotalMS - jsonData.wEA.segmentCurrentMS) < 10000) {
-				powerBarTargetNext.style.left = (segments[seg+1].effort * 50).toString() + "%";
-				powerBarTargetNext.style.visibility = "visible";
-			}
-			else powerBarTargetNext.style.visibility = "hidden";
-
-			powerBarPointDisplay.innerHTML = jsonData.uEAs[selectedUser].points;
-			
-
-            cadAct.innerHTML = jsonData.uEAs[selectedUser].cad;
-
-            cadAct.style.backgroundColor = "white";
-            cadBarContainer.style.backgroundColor = "white";
-            if (jsonData.uEAs[selectedUser].cad > (segments[seg].cadTarget + segments[seg].ptsCadPlus))
-            {
-				cadAct.style.backgroundColor = "white";
-				cadBarContainer.style.backgroundColor = "white";
-            }
-			else if (jsonData.uEAs[selectedUser].cad >= (segments[seg].cadTarget))
-            {
-				cadAct.style.backgroundColor = "lime";
-				cadBarContainer.style.backgroundColor = "lime";
-            }
-			else if (jsonData.uEAs[selectedUser].cad >= (segments[seg].cadTarget - segments[seg].ptsCadMinus))
-            {
-				cadAct.style.backgroundColor = "yellow";
-				cadBarContainer.style.backgroundColor = "yellow";
-            }
-
-            cadTar.innerHTML = segments[seg].cadTarget;
-            heartRate.innerHTML = jsonData.uEAs[selectedUser].hr;
-
-            cadBar.style.width = (~~((jsonData.uEAs[selectedUser].cad / 150) * 100)).toString() + "%";
-            cadBarTarget.style.left = (0.6666*segments[seg].cadTarget).toString() + "%";
-            cadBarRange.style.left = (0.6666 * (segments[seg].cadTarget - segments[seg].ptsCadMinus)).toString().toString() + "%";
-            cadBarRange.style.width = (0.6666*(segments[seg].ptsCadPlus + segments[seg].ptsCadMinus)).toString() + "%";
-            if ((jsonData.wEA.segmentTotalMS - jsonData.wEA.segmentCurrentMS) < 10000) {
-                cadBarTargetNext.style.left = (0.6666 * segments[seg+1].cadTarget).toString() + "%";
-                cadBarTargetNext.style.visibility = "visible";
-            }
-            else cadBarTargetNext.style.visibility = "hidden";
-
-
-			
-
-            totTime.innerHTML = msToTime(jsonData.wEA.workoutCurrentMS);
-            segTime.innerHTML = msToTime(999 + jsonData.wEA.segmentTotalMS - jsonData.wEA.segmentCurrentMS);
-
-            powerIndNext1.style.width = (~~(jsonData.wEA.segmentTotalMS - jsonData.wEA.segmentCurrentMS) / 500).toString() + "px";
-
-
-            if (segments[seg].type == 'OverUnder')
-            {
-                powerIndNext1.style.height = (currentEffort * 50).toString() + "%";
-                powerIndNext1RampUp.style.visibility = "hidden";
-                powerIndNext1RampDown.style.visibility = "hidden";
-            }
-            else if  (segments[seg].type == 'ramp') 
-            {
-                if (currentEffort < segments[seg].effortFinish)
-                {
-                    // ramp up condition
-                    powerIndNext1.style.height = (currentEffort * 50).toString() + "%";
-                    powerIndNext1RampDown.style.visibility = "hidden";
-                    powerIndNext1RampUp.style.visibility = "visible";
-                    powerIndNext1RampUp.style.borderLeftWidth = (~~(jsonData.wEA.segmentTotalMS - jsonData.wEA.segmentCurrentMS) / 500 + 1).toString() + "px";;
-                    powerIndNext1RampUp.style.borderBottomWidth = ~~(40*(segments[seg].effortFinish - currentEffort)+1).toString() + "px";
-                    powerIndNext1RampUp.style.top = ((2-segments[seg].effortFinish) * 50).toString()+"%"
-                }
-                else
-                {
-                    //ramp down condition
-                    powerIndNext1.style.height = (segments[seg].effortFinish * 50).toString() + "%";
-                    powerIndNext1RampUp.style.visibility = "hidden";
-                    powerIndNext1RampDown.style.visibility = "visible";
-                    powerIndNext1RampDown.style.borderRightWidth = (~~(jsonData.wEA.segmentTotalMS - jsonData.wEA.segmentCurrentMS) / 500 + 1).toString() + "px";;
-                    powerIndNext1RampDown.style.borderBottomWidth = ~~(40 * (currentEffort - segments[seg].effortFinish) + 1).toString() + "px";
-                    powerIndNext1RampDown.style.top = ((2 - currentEffort) * 50).toString() + "%"
-
-                }
-
-            }
-            else
-            {
-                powerIndNext1.style.height = (currentEffort * 50).toString() + "%";
-                powerIndNext1RampUp.style.visibility = "hidden";
-                powerIndNext1RampDown.style.visibility = "hidden";
-            }
-
-
-            powerIndCur.style.height = (~~((jsonData.uEAs[selectedUser].instPwr / jsonData.uEAs[selectedUser].ftp) * 50)).toString() + "%";
-
-            //if (seg != segLast) {
-                segLast = seg;
-                updateInd(powerIndNext2, powerIndNext2RampUp, powerIndNext2RampDown, segments[seg + 1]);
-                updateInd(powerIndNext3, powerIndNext3RampUp, powerIndNext3RampDown, segments[seg + 2]);
-                updateInd(powerIndNext4, powerIndNext4RampUp, powerIndNext4RampDown, segments[seg + 3]);
-                updateInd(powerIndNext5, powerIndNext5RampUp, powerIndNext5RampDown, segments[seg + 4]);
-                updateInd(powerIndNext6, powerIndNext6RampUp, powerIndNext6RampDown, segments[seg + 5]);
-                updateInd(powerIndNext7, powerIndNext7RampUp, powerIndNext7RampDown, segments[seg + 6]);
-                updateInd(powerIndNext8, powerIndNext8RampUp, powerIndNext8RampDown, segments[seg + 7]);
-                updateInd(powerIndNext9, powerIndNext9RampUp, powerIndNext9RampDown, segments[seg + 8]);
-            //};
-
-
-            //inc1.innerHTML = JSON.stringify(jsonData.wEA, null, "\t");
-            /*inc2.innerHTML = "users:</br>" 
-            */
-
-            if ( userLast != jsonData.uEAs.length)
-            {
-                userLast != jsonData.uEAs.length;
-                userSelect.innerHTML = "<option value=\"0\">Select</option>";
-                points.innerHTML = "";
-                for (var i in jsonData.uEAs) {
-                    //<option value="standard">Standard: 7 day</option>
-                    userSelect.innerHTML += "<option value=\"" + (Number(i) + 1) + "\">" + jsonData.uEAs[i].name + "</option>";
-                    points.innerHTML += "<div class=\"gTime\">";
-                    points.innerHTML += "<div class=\"gTimeLabel\">" + jsonData.uEAs[i].name + "</div>";
-                    points.innerHTML += "<div class=\"gSpace\"></div>";
-                    points.innerHTML += "<div class=\"gTimeTime\">" + jsonData.uEAs[i].points + "</div>";
-                    points.innerHTML += "</div>";
-                }
-
-            }
-
-            /*
-*/
-
-        };
-
-    };
+    ws.onmessage = function (evt) { updateUI(evt); };
 
     // when the connection is established, this method is called
-    ws.onopen = function () {
-        inc.innerHTML += '.. connection open<br/>';
-    };
+    ws.onopen = function () { inc.innerHTML += '.. connection open<br/>'; };
 
     // when the connection is closed, this method is called
-    ws.onclose = function () {
-        inc.innerHTML += '.. connection closed<br/>';
-    }
+    ws.onclose = function () { inc.innerHTML += '.. connection closed<br/>'; };
 
+    pauseBtn.onclick = function () { pause(); };
+
+}
+
+function pause() {
+    ws.send("click");
+}
+
+function updateUI(evt) {
+    var jsonData = JSON.parse(evt.data);
+
+    if (jsonData.title) {
+        //pageone
+        workoutName.innerHTML = jsonData.title;
+        segments = jsonData.segments;
+    };
+
+    selectedUser = Number(getQueryVariable("id") - 1);
+    if (selectedUser < 0)
+        selectedUser = 0;
+
+
+    if (jsonData.wEA)
+    {
+        userName.innerHTML = jsonData.uEAs[selectedUser].name;
+        var seg = jsonData.wEA.currentSegment;
+        if (seg < 0) seg = 0;
+
+        var currentEffort = segments[seg].effort;
+        if (jsonData.wEA.alternateTarget > 0)
+            currentEffort = jsonData.wEA.alternateTarget;
+
+        segmentName.innerHTML = segments[seg].segmentName;
+
+        powerAct.innerHTML = jsonData.uEAs[selectedUser].instPwr;
+
+        powerTar.innerHTML = (currentEffort * jsonData.uEAs[selectedUser].ftp).toFixed(0);
+        powerAct.style.backgroundColor = "white";
+        powerBarContainer.style.backgroundColor = "white";
+        if (jsonData.uEAs[selectedUser].instPwr >= ((currentEffort + segments[seg].ptsPlus) * jsonData.uEAs[selectedUser].ftp)) {
+            powerAct.style.backgroundColor = "white";
+            powerBarContainer.style.backgroundColor = "white";
+        }
+        else if (jsonData.uEAs[selectedUser].instPwr >= (currentEffort * jsonData.uEAs[selectedUser].ftp)) {
+            powerAct.style.backgroundColor = "lime";
+            powerBarContainer.style.backgroundColor = "lime";
+        }
+        else if (jsonData.uEAs[selectedUser].instPwr >= ((currentEffort - segments[seg].ptsMinus) * jsonData.uEAs[selectedUser].ftp)) {
+            powerAct.style.backgroundColor = "yellow";
+            powerBarContainer.style.backgroundColor = "yellow";
+        }
+
+        powerLast.innerHTML = jsonData.uEAs[selectedUser].lastAvgPwr;
+
+        powerBar.style.width = (~~((jsonData.uEAs[selectedUser].instPwr / jsonData.uEAs[selectedUser].ftp) * 50)).toString() + "%";
+        powerBarTarget.style.left = (currentEffort * 50).toString() + "%";
+        powerBarRange.style.left = ((currentEffort - segments[seg].ptsMinus) * 50).toString() + "%";
+        powerBarRange.style.width = ((segments[seg].ptsPlus + segments[seg].ptsMinus) * 50).toString() + "%";
+        if ((jsonData.wEA.segmentTotalMS - jsonData.wEA.segmentCurrentMS) < 10000) {
+            powerBarTargetNext.style.left = (segments[seg + 1].effort * 50).toString() + "%";
+            powerBarTargetNext.style.visibility = "visible";
+        }
+        else powerBarTargetNext.style.visibility = "hidden";
+
+        powerBarPoints.innerHTML = jsonData.uEAs[selectedUser].points;
+
+        cadAct.innerHTML = jsonData.uEAs[selectedUser].cad;
+
+        cadAct.style.backgroundColor = "white";
+        cadBarContainer.style.backgroundColor = "white";
+        if (jsonData.uEAs[selectedUser].cad > (segments[seg].cadTarget + segments[seg].ptsCadPlus)) {
+            cadAct.style.backgroundColor = "white";
+            cadBarContainer.style.backgroundColor = "white";
+        }
+        else if (jsonData.uEAs[selectedUser].cad >= (segments[seg].cadTarget)) {
+            cadAct.style.backgroundColor = "lime";
+            cadBarContainer.style.backgroundColor = "lime";
+        }
+        else if (jsonData.uEAs[selectedUser].cad >= (segments[seg].cadTarget - segments[seg].ptsCadMinus)) {
+            cadAct.style.backgroundColor = "yellow";
+            cadBarContainer.style.backgroundColor = "yellow";
+        }
+
+        cadTar.innerHTML = segments[seg].cadTarget;
+        heartRate.innerHTML = jsonData.uEAs[selectedUser].hr;
+
+        cadBar.style.width = (~~((jsonData.uEAs[selectedUser].cad / 150) * 100)).toString() + "%";
+        cadBarTarget.style.left = (0.6666 * segments[seg].cadTarget).toString() + "%";
+        cadBarRange.style.left = (0.6666 * (segments[seg].cadTarget - segments[seg].ptsCadMinus)).toString().toString() + "%";
+        cadBarRange.style.width = (0.6666 * (segments[seg].ptsCadPlus + segments[seg].ptsCadMinus)).toString() + "%";
+        if ((jsonData.wEA.segmentTotalMS - jsonData.wEA.segmentCurrentMS) < 10000) {
+            cadBarTargetNext.style.left = (0.6666 * segments[seg + 1].cadTarget).toString() + "%";
+            cadBarTargetNext.style.visibility = "visible";
+        }
+        else cadBarTargetNext.style.visibility = "hidden";
+
+        totTime.innerHTML = msToTime(jsonData.wEA.workoutCurrentMS);
+        segTime.innerHTML = msToTime(999 + jsonData.wEA.segmentTotalMS - jsonData.wEA.segmentCurrentMS);
+
+        powerIndNext1.style.width = (~~(jsonData.wEA.segmentTotalMS - jsonData.wEA.segmentCurrentMS) / 500).toString() + "px";
+
+
+        if (segments[seg].type == 'OverUnder') {
+            powerIndNext1.style.height = (currentEffort * 50).toString() + "%";
+            powerIndNext1RampUp.style.visibility = "hidden";
+            powerIndNext1RampDown.style.visibility = "hidden";
+        }
+        else if (segments[seg].type == 'ramp') {
+            if (currentEffort < segments[seg].effortFinish) {
+                // ramp up condition
+                powerIndNext1.style.height = (currentEffort * 50).toString() + "%";
+                powerIndNext1RampDown.style.visibility = "hidden";
+                powerIndNext1RampUp.style.visibility = "visible";
+                powerIndNext1RampUp.style.borderLeftWidth = (~~(jsonData.wEA.segmentTotalMS - jsonData.wEA.segmentCurrentMS) / 500 + 1).toString() + "px";;
+                powerIndNext1RampUp.style.borderBottomWidth = ~~(40 * (segments[seg].effortFinish - currentEffort) + 1).toString() + "px";
+                powerIndNext1RampUp.style.top = ((2 - segments[seg].effortFinish) * 50).toString() + "%"
+            }
+            else {
+                //ramp down condition
+                powerIndNext1.style.height = (segments[seg].effortFinish * 50).toString() + "%";
+                powerIndNext1RampUp.style.visibility = "hidden";
+                powerIndNext1RampDown.style.visibility = "visible";
+                powerIndNext1RampDown.style.borderRightWidth = (~~(jsonData.wEA.segmentTotalMS - jsonData.wEA.segmentCurrentMS) / 500 + 1).toString() + "px";;
+                powerIndNext1RampDown.style.borderBottomWidth = ~~(40 * (currentEffort - segments[seg].effortFinish) + 1).toString() + "px";
+                powerIndNext1RampDown.style.top = ((2 - currentEffort) * 50).toString() + "%"
+
+            }
+
+        }
+        else {
+            powerIndNext1.style.height = (currentEffort * 50).toString() + "%";
+            powerIndNext1RampUp.style.visibility = "hidden";
+            powerIndNext1RampDown.style.visibility = "hidden";
+        }
+
+        powerIndCur.style.height = (~~((jsonData.uEAs[selectedUser].instPwr / jsonData.uEAs[selectedUser].ftp) * 50)).toString() + "%";
+
+        segLast = seg;
+        updateInd(powerIndNext2, powerIndNext2RampUp, powerIndNext2RampDown, segments[seg + 1]);
+        updateInd(powerIndNext3, powerIndNext3RampUp, powerIndNext3RampDown, segments[seg + 2]);
+        updateInd(powerIndNext4, powerIndNext4RampUp, powerIndNext4RampDown, segments[seg + 3]);
+        updateInd(powerIndNext5, powerIndNext5RampUp, powerIndNext5RampDown, segments[seg + 4]);
+        updateInd(powerIndNext6, powerIndNext6RampUp, powerIndNext6RampDown, segments[seg + 5]);
+        updateInd(powerIndNext7, powerIndNext7RampUp, powerIndNext7RampDown, segments[seg + 6]);
+        updateInd(powerIndNext8, powerIndNext8RampUp, powerIndNext8RampDown, segments[seg + 7]);
+        updateInd(powerIndNext9, powerIndNext9RampUp, powerIndNext9RampDown, segments[seg + 8]);
+
+        if (userLast != jsonData.uEAs.length) {
+            userLast != jsonData.uEAs.length;
+            userSelect.innerHTML = "<option value=\"0\">Select</option>";
+            points.innerHTML = "";
+            for (var i in jsonData.uEAs) {
+                //<option value="standard">Standard: 7 day</option>
+                userSelect.innerHTML += "<option value=\"" + (Number(i) + 1) + "\">" + jsonData.uEAs[i].name + "</option>";
+                points.innerHTML += "<div class=\"gTime\">";
+                points.innerHTML += "<div class=\"gTimeLabel\">" + jsonData.uEAs[i].name + "</div>";
+                points.innerHTML += "<div class=\"gSpace\"></div>";
+                points.innerHTML += "<div class=\"gTimeTime\">" + jsonData.uEAs[i].points + "</div>";
+                points.innerHTML += "</div>";
+            }
+
+        }
+    }
 }
 
 function updateInd(base, RampUp, RampDown, seg)
