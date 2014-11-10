@@ -26,6 +26,7 @@ using System.Net.Sockets;
 //using System.Runtime.InteropServices;
 //using Bend.Util;
 using System.Threading;
+using SpotifyAPI;
 
 
 namespace CycleSoft
@@ -54,7 +55,16 @@ namespace CycleSoft
         private Thread webThread;
         private ThreadStart webListen;
         private cWebSocketServer theServer;
-        private int clientCount; 
+        private int clientCount;
+
+        private static readonly Lazy<SpotifyApi> SpotifyClient = new Lazy<SpotifyApi>(() =>
+        {
+            var api = new SpotifyApi();
+            api.Initialize();
+            Thread.Sleep(300);
+            return api;
+        });
+
 
         public class JsonData
         {
@@ -191,7 +201,8 @@ namespace CycleSoft
 
             for (int i = 0; i < WorkoutHandler.workOutList.Count; i++)
             {
-                cbSelectWorkout.Items.Add(WorkoutHandler.workOutList[i].title);
+                TimeSpan woTime = new TimeSpan(0, 0, (int)WorkoutHandler.workOutList[i].length);
+                cbSelectWorkout.Items.Add(WorkoutHandler.workOutList[i].title + " " + woTime.ToString(@"h\:mm\:ss"));
                 cbSelectEditWorkout.Items.Add(WorkoutHandler.workOutList[i].title);
             }
 
@@ -521,13 +532,21 @@ namespace CycleSoft
 
         }
 
-        public void remotePlayPauseEvent(object sender, EventArgs e)
+        public void remotePlayPauseEvent(object sender, remoteEventArgs e)
         {
-            this.Dispatcher.BeginInvoke((Action)(() =>
-            {
-                playPause();
-            }
-            ));
+            if (e.pauseWorkout)
+                this.Dispatcher.BeginInvoke((Action)(() =>
+                {
+                    playPause();
+                }
+                ));
+
+            if (e.nextSpotify)
+                SpotifyClient.Value.Next();
+
+            if (e.playPauseSpotify)
+                SpotifyClient.Value.PlayPause();
+
         }
 
         

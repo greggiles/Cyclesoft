@@ -8,7 +8,7 @@
         <ComboBox Height="23" HorizontalAlignment="Left" Margin="12,129,0,0" Name="comboBox1" VerticalAlignment="Top" Width="254" SelectionChanged="comboBox1_SelectionChanged"/>
         <TextBox Height="23" HorizontalAlignment="Left" Margin="12,41,0,0" Name="textBoxFTP" VerticalAlignment="Top" Width="90" />
         <Button Content="Save FTP" Height="23" HorizontalAlignment="Left" Margin="124,41,0,0" Name="buttonSaveFTP" VerticalAlignment="Top" Width="142" Click="buttonSaveFTP_Click" />
-        <TextBox Height="23" HorizontalAlignment="Left" Margin="12,100,0,0" Name="textBox1" VerticalAlignment="Top" Width="254" Text="Select Trainer for Virt Power:" IsEnabled="False" />
+        <TextBox Height="23" HorizontalAlignment="Left" Margin="12,100,0,0" Name="textBox1" VerticalAlignment="Top" Width="254" Text="Select Trainer for Calculated Power:" IsEnabled="False" />
         <TextBox Height="23" HorizontalAlignment="Left" Margin="12,71,0,0" Name="textBoxPowerAvgTime" VerticalAlignment="Top" Width="90" />
         <Button Content="Save Avg Filter Time" Height="23" HorizontalAlignment="Left" Margin="124,71,0,0" Name="buttonSaveAvgFilter" VerticalAlignment="Top" Width="142" Click="buttonSaveAvgFilter_Click" />
         <Canvas Margin="12,187,7.4,34.8" Name="canvas1" Background="Black">
@@ -25,7 +25,7 @@
             </Path>
             <Label Canvas.Left="14" Canvas.Top="6" Content="Instructions" Height="30" Name="calInstructions" Width="204" Foreground="White" />
         </Canvas>
-        <TextBox Height="23" IsEnabled="False" Margin="12,158,10,0" Name="calTitleBox" Text="Calibration:" VerticalAlignment="Top" />
+        <TextBox Height="23" IsEnabled="False" Margin="12,158,10,0" Name="calTitleBox" Text="Calibration (very beta):" VerticalAlignment="Top" />
         <Button Content="Do Calibration" Height="23" Margin="12,0,0,3" Name="btnDoCalibration" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="116" Click="btnDoCalibration_Click" />
         <Button Content="Save Calibration" Height="23" Margin="0,0,9,3" Name="btnSaveCalibration" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="120" Click="btnSaveCalibration_Click" />
     </Grid>

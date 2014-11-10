@@ -32,7 +32,7 @@
     <ProductName>tAlleyCat</ProductName>
     <PublisherName>CycleSoft</PublisherName>
     <SuiteName>CycleSoft</SuiteName>
-    <ApplicationRevision>20</ApplicationRevision>
+    <ApplicationRevision>22</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -111,6 +111,8 @@
     <Compile Include="SimpleHttpServer.cs" />
     <Compile Include="spdStream.cs" />
     <Compile Include="powerStream.cs" />
+    <Compile Include="spotify1\SpotifyApi.cs" />
+    <Compile Include="spotify1\TrackInfo.cs" />
     <Compile Include="UserPointPanel.xaml.cs">
       <DependentUpon>UserPointPanel.xaml</DependentUpon>
     </Compile>
@@ -231,6 +233,27 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="web\js\websocket.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="web\png_images\fast-backward.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="web\png_images\fast-forward.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="web\png_images\pause.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="web\png_images\play.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="web\png_images\volume-down.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="web\png_images\volume-off.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="web\png_images\volume-up.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="web\stylesheet.css">

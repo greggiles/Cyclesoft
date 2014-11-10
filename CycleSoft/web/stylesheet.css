@@ -221,3 +221,6 @@
 	margin: 0px;
 }
 
+.ui-icon-myapp-play {
+	background-image: url("png_images/play.png");
+}

@@ -67,7 +67,7 @@ var start = function () {
     var segments;
     var selectedUser = 0;
     var segLast = -1;   // segment last scan
-    var userLast = 0;   // how many users? 
+    userLast = 0;   // how many users? 
 
     //inc.innerHTML += "connecting to server ..<br/>";
 
@@ -100,12 +100,30 @@ var start = function () {
     // when the connection is closed, this method is called
     ws.onclose = function () { inc.innerHTML += '.. connection closed<br/>'; };
 
-    pauseBtn.onclick = function () { pause(); };
+    $("#playSpotify").click(function () { playSpotify(); });
+    $("#nextSpotify").click(function () { nextSpotify(); });
+    $("#muteBtn").click(function () { mute(); });
+    $("#pauseBtn").click(function () { pause(); });
 
 }
 
 function pause() {
-    ws.send("click");
+    ws.send("pauseWorkout");
+}
+function mute() {
+    ws.send("muteWorkout");
+}
+function playSpotify() {
+    ws.send("playSpotify");
+}
+function prevSpotify() {
+    ws.send("prevSpotify");
+}
+function nextSpotify() {
+    ws.send("nextSpotify");
+}
+function muteSpotify() {
+    ws.send("muteSpotify");
 }
 
 function updateUI(evt) {
@@ -115,6 +133,7 @@ function updateUI(evt) {
         //pageone
         workoutName.innerHTML = jsonData.title;
         segments = jsonData.segments;
+        $('#pauseBtn').parent().find('.ui-btn-text').html('Start');
     };
 
     selectedUser = Number(getQueryVariable("id") - 1);
@@ -122,8 +141,21 @@ function updateUI(evt) {
         selectedUser = 0;
 
 
-    if (jsonData.wEA)
-    {
+    if (jsonData.wEA) {
+
+        if (jsonData.wEA.finished) {
+            $('#pauseBtn').parent().find('.ui-btn-text').html('Finished!');
+        }
+        else if (jsonData.wEA.currentSegment < 0 && jsonData.wEA.message.indexOf('Load') != 0) {
+            $('#pauseBtn').parent().find('.ui-btn-text').html(jsonData.wEA.message.substring(jsonData.wEA.message.lastIndexOf('in')));
+        }
+        else if (jsonData.wEA.paused && segments != null) {
+            $('#pauseBtn').parent().find('.ui-btn-text').html('Start');
+        }
+        else if (jsonData.wEA.running) {
+            $('#pauseBtn').parent().find('.ui-btn-text').html('Pause');
+        }
+
         userName.innerHTML = jsonData.uEAs[selectedUser].name;
         var seg = jsonData.wEA.currentSegment;
         if (seg < 0) seg = 0;

@@ -11,12 +11,22 @@ namespace CycleSoft
 {
     public delegate void remoteEventStartStop(object sender, EventArgs e);
 
+    public class remoteEventArgs : EventArgs
+    {
+        public bool pauseWorkout { get; set; } // used only in userWindow
+        public bool muteWorkout { get; set; } // used only in userWindow
+        public bool playPauseSpotify { get; set; } // used only in userWindow
+        public bool prevSpotify { get; set; } // used only in userWindow
+        public bool nextSpotify { get; set; } // used only in userWindow
+        public bool muteSpotify { get; set; } // used only in userWindow
+    }
+
     class cWebSocketServer
     {
         private WebSocketServer server;
         private List<IWebSocketConnection> allSockets;
         public int clientCount { get; private set; }
-        public event EventHandler<EventArgs> remoteEventStartStop;
+        public event EventHandler<remoteEventArgs> remoteEventStartStop;
 
         public cWebSocketServer()
         {   
@@ -41,8 +51,18 @@ namespace CycleSoft
                         {
                             if (null != remoteEventStartStop)
                             {
-                                EventArgs e = new EventArgs();
+                                remoteEventArgs e = new remoteEventArgs();
+                                if (message.Contains("playSpotify"))
+                                    e.playPauseSpotify = true;
+                                if (message.Contains("nextSpotify"))
+                                    e.nextSpotify = true;
+                                if (message.Contains("pauseWorkout"))
+                                    e.pauseWorkout = true;
+                                if (message.Contains("muteWorkout"))
+                                    e.muteWorkout = true;
+
                                 remoteEventStartStop(this, e);
+
                             }
                             
                          /*   var assembly = Assembly.GetExecutingAssembly();
