@@ -19,7 +19,7 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
-    <PublishUrl>publish\</PublishUrl>
+    <PublishUrl>C:\Users\ggiles\Documents\GitHub\CycleSoft\publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
     <UpdateEnabled>false</UpdateEnabled>
@@ -32,7 +32,7 @@
     <ProductName>tAlleyCat</ProductName>
     <PublisherName>CycleSoft</PublisherName>
     <SuiteName>CycleSoft</SuiteName>
-    <ApplicationRevision>22</ApplicationRevision>
+    <ApplicationRevision>23</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -60,10 +60,10 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>D880F26A3E60EA9457D5579EE168F3E9F080A318</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>7487185F44087C63D4833DC712136BB8849E72B1</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>ANTSniffer_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>CycleSoft_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <GenerateManifests>true</GenerateManifests>
@@ -171,6 +171,7 @@
     <Content Include="applicationhost.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="CycleSoft_TemporaryKey.pfx" />
     <None Include="LaunchWeb.bat">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

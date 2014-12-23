@@ -97,7 +97,11 @@ namespace CycleSoft
             {
                 Point rtnPt = new Point();
                 rtnPt.X = inputPoints[i].X;
-                rtnPt.Y = (2 * inputPoints[i].Y - 1) / chartZoom + .5;
+                //rtnPt.Y = ((inputPoints[i].Y - 1) / chartZoom) + .5;
+                //with chart zoom = 2, "1" should return 0 and "-1" should return 1
+                // return .5 + -Y/chartzoom
+                // @ .5 w chart zoom 1 = .5 
+                rtnPt.Y = .5 - inputPoints[i].Y/chartZoom;
                 if (rtnPt.Y > 1) rtnPt.Y = 1;
                 if (rtnPt.Y < 0) rtnPt.Y = 0;
                 returnPoints.Add(rtnPt);

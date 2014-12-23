@@ -252,9 +252,11 @@ namespace CycleSoft
                 Point cad = new Point(x, 1 - y);
                 cadData.Add(cad);
 
-                y = (double)powerInst / (powerMax);
-                if (y > 1) y = 1;
-                Point pwr = new Point(x, 1 - y);
+//                y = (double)powerInst / (powerMax);
+                y = (double)(powerInst - e.ftp )/ (e.ftp);
+//                if (y > 1) y = 1;
+//                Point pwr = new Point(x, 1 - y);
+                Point pwr = new Point(x, y);
                 pwrData.Add(pwr);
             }
 
@@ -415,7 +417,7 @@ namespace CycleSoft
             if ((pwrData!= null) && pwrData.Count > 0)
                 redraw_line(pwrline, dwgEngine.scaleLine(pwrData));
             if ((spdData != null) && spdData.Count > 0)
-                redraw_line(spdline, dwgEngine.scaleLine(spdData));
+                redraw_line(spdline, spdData);
         }
 
         private void draw_workout()
